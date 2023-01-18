@@ -1,0 +1,127 @@
+@import 'libs/bootstrap-reboot.min';
+@import 'libs/fonts';
+
+* {
+    font-family: 'Ubuntu', sans-serif;
+}
+
+.container {
+    width: 1440px;
+    margin: 0 auto;
+}
+
+header {
+    background-color:  rgb(170, 170, 170);
+    height: 70px;
+    .menu__wrapper {
+        height: 70px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        h1{
+            margin: 0;
+        }
+    }
+}
+
+.main {
+    &__wrapper {
+        padding: 40px 0px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .board {
+            background-color: rgb(170, 170, 170);
+            width: 65%;
+            height: 550px;
+            padding: 1%;
+            #canvas {
+                width: 100%;
+                height: 100%;
+                margin: auto auto;
+                background-color: #fff;
+            }
+        }
+    
+        .interface {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+            width: 25%;
+            height: 550px;
+            .get_image__wrapper {
+                padding: 4%;
+                width: 100%;
+                height: 300px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                flex-direction: column;
+                background-color: rgb(170, 170, 170);
+                .get_image-url {
+                    width: 100%;
+                    #image-url {
+                        width: 100%;
+                        padding: 2%;
+                    }
+                }
+                #image {
+                    width: 100%;
+                    height: 220px;
+                    background-color: #fff;
+                }
+            }
+
+            .decorations__wrapper {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                button {
+                    width: 115px;
+                    height: 115px;
+                }
+            }
+
+            .result__wrapper {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                #clean_board {
+                    height: 50px;
+                    width: 50px;
+                    background-color: rgb(255, 180, 180);
+                    padding: 0;
+                }
+                #save {
+                    height: 50px;
+                    width: 300px;
+                    background-color: rgb(180, 255, 199);
+                }
+            }
+        }
+
+    }
+}
+
+footer {
+    background-color:  rgb(170, 170, 170);
+    height: 55px;
+    .footer__wrapper {
+        width: 100%;
+        height: 55px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        a {
+            margin: 0;
+            margin-right: 15px;
+        }
+        span {
+            margin: 0;
+            margin-right: 15px;
+        }
+    }
+}
