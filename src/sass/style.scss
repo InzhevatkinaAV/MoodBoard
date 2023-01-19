@@ -31,17 +31,13 @@ header {
         justify-content: space-between;
         align-items: center;
         .board {
-            // background-color: rgb(170, 170, 170);
             width: 950px;
             height: 550px;
-            // padding: 15px;
             #canvas {
                 width: 950px;
                 height: 550px;
                 background-color: #fff;
-                // background: url("../img/board/cork_board.jpg") center center/cover no-repeat;
                 background: url("../img/board/white_board.jpg") center center/cover no-repeat;
-                // background: url("../img/board/graphite_board.jpg") center center/cover no-repeat;
             }
         }
     
@@ -72,13 +68,14 @@ header {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    width: 100%;
+                    width: 330px;
                     height: 220px;
                     background-color: rgb(170, 170, 170);
                     #new_image {
                         object-fit: contain;
                         max-width: 100%;
                         max-height: 220px;
+                        z-index: 1;
                     }
                 }
             }

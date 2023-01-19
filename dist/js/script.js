@@ -28,15 +28,37 @@ let newImg = document.querySelector('#new_image');
 form.addEventListener('submit', function(e) {
     e.preventDefault();
 
+	let newImgDraggable = document.createElement('img');
+
     if (String(input.value) == '') {
         newImg.setAttribute('src', '../img/default_picture.svg');
-        newImg.classList.remove('.draggable');
+        newImgDraggable.remove();
     } else {
         let promise = loadImage(input.value);
 
         promise.then(
-            img => {newImg.setAttribute('src', input.value); newImg.classList.add('.draggable')},
-            error => {newImg.setAttribute('src', '../img/picture_404.svg'); newImg.classList.remove('.draggable')}
+            img => { 
+            	newImg.setAttribute('src', input.value);
+				// try {
+				// 	let previous = document.querySelector('.draggableNewImg');
+
+				// } catch {
+				// 	//создаю копию картинки для переноса на канвас помещаю ее над newImg
+				newImgDraggable.setAttribute('src', input.value);
+				newImgDraggable.style.maxHeight = '220px';
+				newImgDraggable.style.maxWidth = '330px'
+				newImgDraggable.style.objectFit = 'contain';
+				newImgDraggable.style.position = 'absolute';
+				newImgDraggable.style.zIndex = '2';
+				newImgDraggable.classList.add('draggableNewImg');
+				// }
+				
+				newImg.before(newImgDraggable);
+          	},
+            error => {
+				newImg.setAttribute('src', '../img/picture_404.svg');
+				newImgDraggable.remove();
+			}
         );
     }
 });
@@ -69,7 +91,7 @@ document.addEventListener('mousedown', function(event) {
     imgBoard.setAttribute('src', newImg.src);
 
 
-	let dragElement = event.target.closest('.draggable');
+	let dragElement = event.target.closest('.draggableNewImg');
 	if (!dragElement) return;
 	event.preventDefault();
 	dragElement.ondragstart = function() {
