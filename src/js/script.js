@@ -1,4 +1,6 @@
 let canvas = document.querySelector('#canvas');
+
+let boardImagesContainer = document.querySelector('.board-image_container');
 let imagesOnCanvas = new Array();
 
 
@@ -27,6 +29,7 @@ let input = document.querySelector('#new_image-url');
 let form = document.querySelector('#form_new_image-url');
 let newImg = document.querySelector('#new_image');
 let newImgDraggable, leftNewImgDraggable, topNewImgDraggable; //копия newImg, которая будет лежать поверх, для многократного перемещения одной и той же картинки
+let newImgWrapper = document.querySelector('#new_image__wrapper');
 
 form.addEventListener('submit', function(e) {
     e.preventDefault();
@@ -34,10 +37,9 @@ form.addEventListener('submit', function(e) {
 	//удаляем копию предыдущего фото, если она есть (т.е. если в форме не дефолтные картинки)
 	try {
 		let previous = document.querySelector('.draggableNewImg');
-		let parentPrevious = document.querySelector('#new_image__wrapper');
-		parentPrevious.removeChild(previous);
+		newImgWrapper.removeChild(previous);
 		} catch {
-		}
+	}
 
 		newImgDraggable = document.createElement('img');
 
@@ -58,13 +60,15 @@ form.addEventListener('submit', function(e) {
 				newImgDraggable.style.maxWidth = '330px'
 				newImgDraggable.style.objectFit = 'contain';
 				newImgDraggable.style.position = 'absolute';
-				newImgDraggable.style.zIndex = imagesOnCanvas.length + 1;
+				newImgDraggable.style.zIndex = imagesOnCanvas.length + 2;
 				newImgDraggable.classList.add('draggableNewImg');
 				leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
 				topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
+				newImgDraggable.style.left =leftNewImgDraggable;
+				newImgDraggable.style.top = topNewImgDraggable;
 
-				
 				newImg.before(newImgDraggable); //Вставляем newImgDraggable перед newImg в HTML
+				// boardImagesContainer.append(newImgDraggable); 
           	},
             error => {
 				newImg.setAttribute('src', '../img/picture_404.svg');
@@ -100,7 +104,6 @@ let isDragging = false;
 document.addEventListener('mousedown', function(event) {
 	let dragElement = event.target.closest('.draggableNewImg');
 	if (!dragElement) {
-		console.log("!");
 		return;
 	}
 		
@@ -139,6 +142,7 @@ document.addEventListener('mousedown', function(event) {
     shiftY = clientY - element.getBoundingClientRect().top;
 
     element.style.position = 'fixed';
+	element.style.zIndex = imagesOnCanvas.length + 2;
 
     moveAt(clientX, clientY);
   };
@@ -179,12 +183,12 @@ document.addEventListener('mousedown', function(event) {
 	dragElementCopy.style.top = dragElement.getBoundingClientRect().top + 'px';
 	dragElementCopy.style.left = dragElement.getBoundingClientRect().left + 'px';
 	dragElementCopy.classList.add('onboardImg');
-	newImg.before(dragElementCopy);
+	boardImagesContainer.append(dragElementCopy); //перекладываем картинки в спецконтейнер div для всех картинок
 
 	newImgDraggable.style.top = topNewImgDraggable;
 	newImgDraggable.style.left = leftNewImgDraggable;
 
-	//кладем изображение в массив изображений на канвасе
+	//кладем изображение в массив изображений на канвасе, надо бы MAP
 	imagesOnCanvas.push(dragElementCopy);
 	dragElementCopy.style.zIndex = imagesOnCanvas.length;
 	newImgDraggable.style.zIndex = imagesOnCanvas.length + 1;
@@ -255,13 +259,17 @@ document.addEventListener('mousedown', function(event) {
 let isDraggingOnCanvas = false;
 let previousDraggingOnCanvas;
 
+//для удаления
+let deleteZone = document.querySelector('.overlay');
+let interface = document.querySelector('.interface');
+
 document.addEventListener('mousedown', function(event) {
 	let dragElement = event.target.closest('.onboardImg');
 	if (!dragElement) {
 		return;
 	}
 
-	dragElement.style.zIndex = imagesOnCanvas.length + 1;
+	dragElement.style.zIndex = '5001';
 	event.preventDefault();
 	dragElement.ondragstart = function() {
     	return false;
@@ -285,6 +293,8 @@ document.addEventListener('mousedown', function(event) {
 		}
 	
 		isDragging = true;
+		deleteZone.style.display = 'inline';
+		interface.style.zIndex = '-2';
 	
 		document.addEventListener('mousemove', onMouseMove);
 		element.addEventListener('mouseup', onMouseUp);
@@ -293,7 +303,7 @@ document.addEventListener('mousedown', function(event) {
 		shiftY = clientY - element.getBoundingClientRect().top;
 	
 		element.style.position = 'fixed';
-	
+
 		moveAt(clientX, clientY);
 	};
 
@@ -310,28 +320,36 @@ document.addEventListener('mousedown', function(event) {
 		let rightE = dragElement.getBoundingClientRect().right;
 	
 		if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) { //когда попадаем в канвас
-		  dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
-		} else { //когда отпускаем изображение за пределами канваса, оно автоматически встает в левый верхний угол канваса
-		  dragElement.style.left = leftC + 15 + 'px';
-		  dragElement.style.top = topC + 15 + 'px';
+		  	dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
+		} else { 
+			if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) { //когда отпускаем изображение полностью за пределами канваса, оно удаляется
+				dragElement.remove();
+				console.log(imagesOnCanvas.length);
+			} else { //когда отпускаем изображение частично  за пределами канваса, оно возвращается на канвас
+		   		dragElement.style.left = leftC + 15 + 'px';
+		   		dragElement.style.top = topC + 15 + 'px';
+			}
 		}
 
-		// dragElement.style.zIndex = '2';
+
 		if (previousDraggingOnCanvas && previousDraggingOnCanvas != dragElement) {
 			previousDraggingOnCanvas.style.zIndex = imagesOnCanvas.length;
 			imagesOnCanvas.forEach((item) => {
 				if (item.style.zIndex > 0) {
 					item.style.zIndex = item.style.zIndex - 1;
-					console.log("!");
 				}
 					
-			  });
+			});
 		}
 	
 		document.removeEventListener('mousemove', onMouseMove);
 		dragElement.removeEventListener('mouseup', onMouseUp);
 
 		previousDraggingOnCanvas = dragElement;
+		dragElement.style.zIndex = imagesOnCanvas.length + 1;
+		deleteZone.style.display = 'none';
+		interface.style.zIndex = '0';
+
 	}
 	
 	function moveAt(clientX, clientY) {
@@ -386,17 +404,12 @@ document.addEventListener('mousedown', function(event) {
 		}
 	
 		dragElement.style.left = newX + 'px';
-		dragElement.style.top = newY + 'px';
+		dragElement.style.top = newY + 'px';		
 	}
 	
 });
 //--------------------------------------------------------------------------------------------
 
 
-
-//-----------------Удаление изображения с канваса--------------------------------------------
-// document.addEventListener('mousedown', function(event) {
-// });
-//-------------------------------------------------------------------------------------------
 
 

@@ -27,10 +27,12 @@
     <section class="main">
         <div class="container">
             <div class="main__wrapper">
-                <div class="board">
-                    <canvas id="canvas">
-            
-                    </canvas>
+
+                <div class="board__wrapper">
+                    <canvas id="canvas"></canvas>
+                    <div class="board-image_container">
+                        
+                    </div>
                 </div>
 
                 <div class="interface">
@@ -39,7 +41,6 @@
                             <input id="new_image-url" type="url">
                         </form>
                         <div id="new_image__wrapper">
-
                             <img id="new_image" src="img/default_picture.svg" alt="newImage">
                         </div>
                     </div>
@@ -55,6 +56,7 @@
                         <button id="btn_save">Save</button>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
@@ -71,6 +73,8 @@
             </div>
         </div>
     </footer>
+
+    <div class="overlay"></div>
     
     <script src="js/script.js"></script>
 </body>
