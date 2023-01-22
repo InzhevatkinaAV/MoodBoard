@@ -2,6 +2,7 @@ let canvas = document.querySelector('#canvas');
 
 let boardImagesContainer = document.querySelector('.board-image_container');
 let imagesOnCanvas = new Array();
+let lengthImagesOnCanvas = imagesOnCanvas.length;
 
 
 //-------------Изменение стиля доски-------------------------------------------------------
@@ -23,6 +24,11 @@ btnSwitchStyle.addEventListener('click', function() {
 //-----------------------------------------------------------------------------------------
 
 
+//для изменения z-индекса
+function zIndexChange(obj, num) {
+	obj.style.zIndex = imagesOnCanvas.length + num;
+}
+
 
 //-------------Взятие изображения по url---------------------------------------------------
 let input = document.querySelector('#new_image-url');
@@ -41,7 +47,7 @@ form.addEventListener('submit', function(e) {
 		} catch {
 	}
 
-		newImgDraggable = document.createElement('img');
+	newImgDraggable = document.createElement('img');
 
     if (String(input.value) == '') {
         newImg.setAttribute('src', '../img/default_picture.svg');
@@ -53,22 +59,23 @@ form.addEventListener('submit', function(e) {
             img => { 
             	newImg.setAttribute('src', input.value);
 				
-				//поверх лежит фото, которое можно перетаскивать
+				//поверх кладем фото, которое можно перетаскивать
 				newImgDraggable.setAttribute('src', input.value);
-				// newImgDraggable.style = newImg.style;
 				newImgDraggable.style.maxHeight = '220px';
 				newImgDraggable.style.maxWidth = '330px'
 				newImgDraggable.style.objectFit = 'contain';
 				newImgDraggable.style.position = 'absolute';
-				newImgDraggable.style.zIndex = imagesOnCanvas.length + 2;
+
+				zIndexChange(newImgDraggable, 3);
+
 				newImgDraggable.classList.add('draggableNewImg');
+
 				leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
 				topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
 				newImgDraggable.style.left =leftNewImgDraggable;
 				newImgDraggable.style.top = topNewImgDraggable;
 
 				newImg.before(newImgDraggable); //Вставляем newImgDraggable перед newImg в HTML
-				// boardImagesContainer.append(newImgDraggable); 
           	},
             error => {
 				newImg.setAttribute('src', '../img/picture_404.svg');
@@ -106,8 +113,9 @@ document.addEventListener('mousedown', function(event) {
 	if (!dragElement) {
 		return;
 	}
-		
+
 	event.preventDefault();
+
 	dragElement.ondragstart = function() {
     	return false;
 	};
@@ -119,6 +127,34 @@ document.addEventListener('mousedown', function(event) {
 
   function onMouseUp(event) {
     finishDrag();
+	//для канваса создаем копию, а перемещаемый элемент из формы помещаем в начальную позицию
+	let dragElementCopy = document.createElement('img');
+	dragElementCopy.setAttribute('src', dragElement.src);
+	dragElementCopy.style.maxHeight = '220px';
+	dragElementCopy.style.maxWidth = '330px'
+	dragElementCopy.style.objectFit = 'contain';
+	dragElementCopy.style.position = 'absolute';
+
+	dragElementCopy.style.top = dragElement.getBoundingClientRect().top + 'px';
+	dragElementCopy.style.left = dragElement.getBoundingClientRect().left + 'px';
+
+	zIndexChange(dragElementCopy, 1);
+
+	dragElementCopy.classList.add('onboardImg');
+	boardImagesContainer.append(dragElementCopy); //перекладываем картинки в спецконтейнер div для всех картинок
+
+	newImgDraggable.style.top = topNewImgDraggable;
+	newImgDraggable.style.left = leftNewImgDraggable;
+	//кладем изображение в массив изображений на канвасе, надо бы MAP
+	imagesOnCanvas.push(dragElementCopy);
+
+	try {
+		newImgDraggable = document.querySelector('.draggableNewImg');
+		zIndexChange(newImgDraggable, 3);
+	} catch {
+
+	}
+	
   };
 
   function onMouseMove(event) {
@@ -128,126 +164,104 @@ document.addEventListener('mousedown', function(event) {
   // в начале перемещения элемента:
   //   запоминаем место клика по элементу (shiftX, shiftY),
   //   переключаем позиционирование элемента (position:fixed) и двигаем элемент
-  function startDrag(element, clientX, clientY) {
-    if(isDragging) {
-      return;
-    }
+	function startDrag(element, clientX, clientY) {
+    	if(isDragging) {
+      		return;
+    	}
 
-    isDragging = true;
+    	isDragging = true;
 
-    document.addEventListener('mousemove', onMouseMove);
-    element.addEventListener('mouseup', onMouseUp);
+    	document.addEventListener('mousemove', onMouseMove);
+    	element.addEventListener('mouseup', onMouseUp);
 
-    shiftX = clientX - element.getBoundingClientRect().left;
-    shiftY = clientY - element.getBoundingClientRect().top;
+    	shiftX = clientX - element.getBoundingClientRect().left;
+    	shiftY = clientY - element.getBoundingClientRect().top;
 
-    element.style.position = 'fixed';
-	element.style.zIndex = imagesOnCanvas.length + 2;
+    	element.style.position = 'fixed';
 
-    moveAt(clientX, clientY);
-  };
+    	moveAt(clientX, clientY);
+  	};
 
-  // переключаемся обратно на абсолютные координаты
-  // чтобы закрепить элемент относительно документа
-  function finishDrag() {   
-    if(!isDragging) {
-      return;
-    }
+  	// переключаемся обратно на абсолютные координаты
+  	// чтобы закрепить элемент относительно документа
+  	function finishDrag() {   
+    	if(!isDragging) {
+      		return;
+    	}
 
-    isDragging = false;
+    	isDragging = false;
 
-    let topE = dragElement.getBoundingClientRect().top;
-    let bottomE = dragElement.getBoundingClientRect().bottom;
-    let leftE = dragElement.getBoundingClientRect().left;
-    let rightE = dragElement.getBoundingClientRect().right;
+    	let topE = dragElement.getBoundingClientRect().top;
+    	let bottomE = dragElement.getBoundingClientRect().bottom;
+    	let leftE = dragElement.getBoundingClientRect().left;
+    	let rightE = dragElement.getBoundingClientRect().right;
 
-    if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) { //когда попадаем в канвас
-      dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
-    } else { //когда отпускаем изображение за пределами канваса, оно автоматически встает в левый верхний угол канваса
-      dragElement.style.left = leftC + 15 + 'px';
-      dragElement.style.top = topC + 15 + 'px';
-    }
+    	if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) { 
+			//когда попадаем в канвас
+      		dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
+    	} else { 
+			//когда отпускаем изображение за пределами канваса, оно автоматически встает в левый верхний угол канваса
+      		dragElement.style.left = leftC + 15 + 'px';
+      		dragElement.style.top = topC + 15 + 'px';
+    	}
 
-    document.removeEventListener('mousemove', onMouseMove);
-    dragElement.removeEventListener('mouseup', onMouseUp);
+    	document.removeEventListener('mousemove', onMouseMove);
+    	dragElement.removeEventListener('mouseup', onMouseUp);
+  	}
 
-	//для канваса создаем копию, а перемещаемый элемент из формы помещаем в начальную позицию
-	let dragElementCopy = document.createElement('img');
-    dragElementCopy.setAttribute('src', dragElement.src);
-	dragElementCopy.style.maxHeight = '220px';
-	dragElementCopy.style.maxWidth = '330px'
-	dragElementCopy.style.objectFit = 'contain';
-	dragElementCopy.style.position = 'absolute';
-	
+  	function moveAt(clientX, clientY) {
+    	// вычисляем новые координаты (относительно окна)
+    	let newX = clientX - shiftX;
+    	let newY = clientY - shiftY;
 
-	dragElementCopy.style.top = dragElement.getBoundingClientRect().top + 'px';
-	dragElementCopy.style.left = dragElement.getBoundingClientRect().left + 'px';
-	dragElementCopy.classList.add('onboardImg');
-	boardImagesContainer.append(dragElementCopy); //перекладываем картинки в спецконтейнер div для всех картинок
+    	// проверяем, не переходят ли новые координаты за нижний край окна:
+    	// сначала вычисляем гипотетический новый нижний край окна
+    	let newBottom = newY + dragElement.offsetHeight;
 
-	newImgDraggable.style.top = topNewImgDraggable;
-	newImgDraggable.style.left = leftNewImgDraggable;
+    	// затем, если новый край окна выходит за пределы документа, прокручиваем страницу
+    	if (newBottom > document.documentElement.clientHeight) {
+    		// координата нижнего края документа относительно окна
+    		let docBottom = document.documentElement.getBoundingClientRect().bottom;
 
-	//кладем изображение в массив изображений на канвасе, надо бы MAP
-	imagesOnCanvas.push(dragElementCopy);
-	dragElementCopy.style.zIndex = imagesOnCanvas.length;
-	newImgDraggable.style.zIndex = imagesOnCanvas.length + 1;
+      		// простой скролл документа на 10px вниз имеет проблему -
+      		// он может прокручивать документ за его пределы,
+      		// поэтому используем Math.min(расстояние до конца, 10)
+      		let scrollY = Math.min(docBottom - newBottom, 10);
 
-  }
+      		// вычисления могут быть не совсем точны - случаются ошибки при округлении,
+      		// которые приводят к отрицательному значению прокрутки. отфильтруем их:
+      		if (scrollY < 0) scrollY = 0;
 
-  function moveAt(clientX, clientY) {
-    
-    // вычисляем новые координаты (относительно окна)
-    let newX = clientX - shiftX;
-    let newY = clientY - shiftY;
+      		window.scrollBy(0, scrollY);
 
-    // проверяем, не переходят ли новые координаты за нижний край окна:
-    // сначала вычисляем гипотетический новый нижний край окна
-    let newBottom = newY + dragElement.offsetHeight;
+      		// быстрое перемещение мыши может поместить курсор за пределы документа вниз
+      		// если это произошло -
+      		// ограничиваем новое значение Y максимально возможным исходя из размера документа:
+      		newY = Math.min(newY, document.documentElement.clientHeight - dragElement.offsetHeight);
+    	}
 
-    // затем, если новый край окна выходит за пределы документа, прокручиваем страницу
-    if (newBottom > document.documentElement.clientHeight) {
-    	// координата нижнего края документа относительно окна
-    	let docBottom = document.documentElement.getBoundingClientRect().bottom;
+    	// проверяем, не переходят ли новые координаты за верхний край окна (по схожему алгоритму)
+    	if (newY < 0) {
+      		// прокручиваем окно вверх
+      		let scrollY = Math.min(-newY, 10);
+      		if (scrollY < 0) scrollY = 0; // проверяем ошибки точности
 
-      	// простой скролл документа на 10px вниз имеет проблему -
-      	// он может прокручивать документ за его пределы,
-      	// поэтому используем Math.min(расстояние до конца, 10)
-      	let scrollY = Math.min(docBottom - newBottom, 10);
-
-      	// вычисления могут быть не совсем точны - случаются ошибки при округлении,
-      	// которые приводят к отрицательному значению прокрутки. отфильтруем их:
-      	if (scrollY < 0) scrollY = 0;
-
-      	window.scrollBy(0, scrollY);
-
-      	// быстрое перемещение мыши может поместить курсор за пределы документа вниз
-      	// если это произошло -
-      	// ограничиваем новое значение Y максимально возможным исходя из размера документа:
-      	newY = Math.min(newY, document.documentElement.clientHeight - dragElement.offsetHeight);
-    }
-
-    // проверяем, не переходят ли новые координаты за верхний край окна (по схожему алгоритму)
-    if (newY < 0) {
-      	// прокручиваем окно вверх
-      	let scrollY = Math.min(-newY, 10);
-      	if (scrollY < 0) scrollY = 0; // проверяем ошибки точности
-
-      	window.scrollBy(0, -scrollY);
-      	// быстрое перемещение мыши может поместить курсор за пределы документа вверх
-      	newY = Math.max(newY, 0); // newY не может быть меньше нуля
-    }
+      		window.scrollBy(0, -scrollY);
+      		// быстрое перемещение мыши может поместить курсор за пределы документа вверх
+      		newY = Math.max(newY, 0); // newY не может быть меньше нуля
+    	}
 
 
-    // ограничим newX размерами окна
-    // согласно условию, горизонтальная прокрутка отсутствует, поэтому это не сложно:
-    if (newX < 0) newX = 0;
-    if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
-      	newX = document.documentElement.clientWidth - dragElement.offsetWidth;
-    }
+    	// ограничим newX размерами окна
+    	// согласно условию, горизонтальная прокрутка отсутствует, поэтому это не сложно:
+    	if (newX < 0) newX = 0;
+    	if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
+      		newX = document.documentElement.clientWidth - dragElement.offsetWidth;
+    	}
 
-    dragElement.style.left = newX + 'px';
-    dragElement.style.top = newY + 'px';
+    	dragElement.style.left = newX + 'px';
+    	dragElement.style.top = newY + 'px';
+
   	}
 
 });
@@ -258,6 +272,7 @@ document.addEventListener('mousedown', function(event) {
 //------------------Перетаскивание изображения внутри канваса---------------------------------
 let isDraggingOnCanvas = false;
 let previousDraggingOnCanvas;
+let takeNewImg = false;
 
 //для удаления
 let deleteZone = document.querySelector('.overlay');
@@ -269,7 +284,10 @@ document.addEventListener('mousedown', function(event) {
 		return;
 	}
 
-	dragElement.style.zIndex = '5001';
+	zIndexChange(dragElement, 2);
+
+	takeNewImg = false;
+
 	event.preventDefault();
 	dragElement.ondragstart = function() {
     	return false;
@@ -281,6 +299,16 @@ document.addEventListener('mousedown', function(event) {
 
 	function onMouseUp(event) {
 		finishDrag();
+
+		try {
+			newImgDraggable = document.querySelector('.draggableNewImg');
+			zIndexChange(newImgDraggable, 3);
+		} catch {
+	
+		}
+
+		zIndexChange(dragElement, 1);
+
 	};
 	
 	function onMouseMove(event) {
@@ -293,7 +321,9 @@ document.addEventListener('mousedown', function(event) {
 		}
 	
 		isDragging = true;
-		deleteZone.style.display = 'inline';
+
+		//Плавно появляется область, перенеся в которую изображение, оно удаляется с доски
+		deleteZone.style.backgroundColor = 'rgba(255, 180, 180, 0.4)';
 		interface.style.zIndex = '-2';
 	
 		document.addEventListener('mousemove', onMouseMove);
@@ -324,80 +354,58 @@ document.addEventListener('mousedown', function(event) {
 		} else { 
 			if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) { //когда отпускаем изображение полностью за пределами канваса, оно удаляется
 				dragElement.remove();
-				console.log(imagesOnCanvas.length);
 			} else { //когда отпускаем изображение частично  за пределами канваса, оно возвращается на канвас
 		   		dragElement.style.left = leftC + 15 + 'px';
 		   		dragElement.style.top = topC + 15 + 'px';
 			}
 		}
-
-
-		if (previousDraggingOnCanvas && previousDraggingOnCanvas != dragElement) {
-			previousDraggingOnCanvas.style.zIndex = imagesOnCanvas.length;
-			imagesOnCanvas.forEach((item) => {
-				if (item.style.zIndex > 0) {
-					item.style.zIndex = item.style.zIndex - 1;
-				}
-					
-			});
-		}
 	
 		document.removeEventListener('mousemove', onMouseMove);
 		dragElement.removeEventListener('mouseup', onMouseUp);
 
-		previousDraggingOnCanvas = dragElement;
-		dragElement.style.zIndex = imagesOnCanvas.length + 1;
-		deleteZone.style.display = 'none';
-		interface.style.zIndex = '0';
+		if (previousDraggingOnCanvas && previousDraggingOnCanvas != dragElement) {
+		 	imagesOnCanvas.forEach((item) => {
+		 		if (item.style.zIndex > 0) {
+		 			item.style.zIndex = item.style.zIndex - 1;
+		 		}
+					
+		 	});
+		}
 
+
+		previousDraggingOnCanvas = dragElement;
+		deleteZone.style.backgroundColor = 'rgba(255, 180, 180, 0)';
+		interface.style.zIndex = '0';
 	}
 	
 	function moveAt(clientX, clientY) {
 		
-		// вычисляем новые координаты (относительно окна)
 		let newX = clientX - shiftX;
 		let newY = clientY - shiftY;
 	
-		// проверяем, не переходят ли новые координаты за нижний край окна:
-		// сначала вычисляем гипотетический новый нижний край окна
 		let newBottom = newY + dragElement.offsetHeight;
 	
-		// затем, если новый край окна выходит за пределы документа, прокручиваем страницу
 		if (newBottom > document.documentElement.clientHeight) {
-			// координата нижнего края документа относительно окна
 			let docBottom = document.documentElement.getBoundingClientRect().bottom;
 	
-			  // простой скролл документа на 10px вниз имеет проблему -
-			  // он может прокручивать документ за его пределы,
-			  // поэтому используем Math.min(расстояние до конца, 10)
-			  let scrollY = Math.min(docBottom - newBottom, 10);
+			let scrollY = Math.min(docBottom - newBottom, 10);
+
+			if (scrollY < 0) scrollY = 0;
 	
-			  // вычисления могут быть не совсем точны - случаются ошибки при округлении,
-			  // которые приводят к отрицательному значению прокрутки. отфильтруем их:
+			window.scrollBy(0, scrollY);
+	
+			newY = Math.min(newY, document.documentElement.clientHeight - dragElement.offsetHeight);
+		}
+	
+		if (newY < 0) {
+			  let scrollY = Math.min(-newY, 10);
 			  if (scrollY < 0) scrollY = 0;
 	
-			  window.scrollBy(0, scrollY);
-	
-			  // быстрое перемещение мыши может поместить курсор за пределы документа вниз
-			  // если это произошло -
-			  // ограничиваем новое значение Y максимально возможным исходя из размера документа:
-			  newY = Math.min(newY, document.documentElement.clientHeight - dragElement.offsetHeight);
-		}
-	
-		// проверяем, не переходят ли новые координаты за верхний край окна (по схожему алгоритму)
-		if (newY < 0) {
-			  // прокручиваем окно вверх
-			  let scrollY = Math.min(-newY, 10);
-			  if (scrollY < 0) scrollY = 0; // проверяем ошибки точности
-	
 			  window.scrollBy(0, -scrollY);
-			  // быстрое перемещение мыши может поместить курсор за пределы документа вверх
-			  newY = Math.max(newY, 0); // newY не может быть меньше нуля
+			  newY = Math.max(newY, 0);
 		}
 	
 	
-		// ограничим newX размерами окна
-		// согласно условию, горизонтальная прокрутка отсутствует, поэтому это не сложно:
 		if (newX < 0) newX = 0;
 		if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
 			  newX = document.documentElement.clientWidth - dragElement.offsetWidth;
@@ -409,6 +417,49 @@ document.addEventListener('mousedown', function(event) {
 	
 });
 //--------------------------------------------------------------------------------------------
+
+
+
+//---------------------Очищение канваса-------------------------------------------------------
+let btnClearBoard = document.querySelector('#btn_clean');
+
+btnClearBoard.addEventListener('click', function() {
+	//Удаление всех картинок
+	for (let i = 0; i < imagesOnCanvas.length; i++) {
+		imagesOnCanvas[i].remove();
+	}
+	imagesOnCanvas.length = 0;
+
+	//Очищение формы и инпута НУЖНО ЛИ?
+	/*input.value = '';
+
+	let newImgDraggable = document.querySelector('.draggableNewImg');
+	newImgDraggable.remove();
+
+	newImg.setAttribute('src', '../img/default_picture.svg');*/
+
+	//удалить текстовое поле-название доски
+
+	//удалить пины
+});
+//--------------------------------------------------------------------------------------------
+
+
+
+//--------------------------Сохранение картинки-----------------------------------------------
+let btnSaveBoard = document.querySelector('#btn_save');
+// let board = document.querySelector('.board__wrapper');
+
+btnClearBoard.addEventListener('click', function() {
+	// var gh = "https://ih1.redbubble.net/image.109336634.1604/flat,550x550,075,f.u1.jpg"
+
+    // let board  = document.createElement('.board__wrapper');
+    // a.href = gh;
+    // board.download = 'image.png';
+
+    // board.click()
+});
+//---------------------------------------------------------------------------------------------
 
 
 
