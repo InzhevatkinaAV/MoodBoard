@@ -1,9 +1,11 @@
 let canvas = document.querySelector('#canvas');
+let container = document.querySelector('.container');
+let marginStart = container.getBoundingClientRect().left;
+let marginNow = container.getBoundingClientRect().left;
+let marginDx = 0;
 
 let boardImagesContainer = document.querySelector('.board-image_container');
 let imagesOnCanvas = new Array();
-let lengthImagesOnCanvas = imagesOnCanvas.length;
-
 
 //-------------Изменение стиля доски-------------------------------------------------------
 let btnSwitchStyle = document.querySelector('#btn_switch_color');
@@ -23,12 +25,10 @@ btnSwitchStyle.addEventListener('click', function() {
 });
 //-----------------------------------------------------------------------------------------
 
-
 //для изменения z-индекса
 function zIndexChange(obj, num) {
 	obj.style.zIndex = imagesOnCanvas.length + num;
 }
-
 
 //-------------Взятие изображения по url---------------------------------------------------
 let input = document.querySelector('#new_image-url');
@@ -72,7 +72,7 @@ form.addEventListener('submit', function(e) {
 
 				leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
 				topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
-				newImgDraggable.style.left =leftNewImgDraggable;
+				newImgDraggable.style.left = leftNewImgDraggable;
 				newImgDraggable.style.top = topNewImgDraggable;
 
 				newImg.before(newImgDraggable); //Вставляем newImgDraggable перед newImg в HTML
@@ -96,16 +96,16 @@ function loadImage(src) {
       document.head.append(img);
     });
   }
+
+//Удобно ли?
+input.addEventListener('dblclick', function() {
+	input.value = '';
+});
 //----------------------------------------------------------------------------------------
 
 
 
 //------Перетаскивание изображения на канвас----------------------------------------------
-let topC = canvas.getBoundingClientRect().top;
-let bottomC = canvas.getBoundingClientRect().bottom;
-let leftC = canvas.getBoundingClientRect().left;
-let rightC = canvas.getBoundingClientRect().right;
-
 let isDragging = false;
 
 document.addEventListener('mousedown', function(event) {
@@ -145,7 +145,7 @@ document.addEventListener('mousedown', function(event) {
 
 	newImgDraggable.style.top = topNewImgDraggable;
 	newImgDraggable.style.left = leftNewImgDraggable;
-	//кладем изображение в массив изображений на канвасе, надо бы MAP
+	//кладем изображение в массив изображений на канвасе
 	imagesOnCanvas.push(dragElementCopy);
 
 	try {
@@ -190,6 +190,11 @@ document.addEventListener('mousedown', function(event) {
     	}
 
     	isDragging = false;
+
+		let topC = canvas.getBoundingClientRect().top;
+		let bottomC = canvas.getBoundingClientRect().bottom;
+		let leftC = canvas.getBoundingClientRect().left;
+		let rightC = canvas.getBoundingClientRect().right;
 
     	let topE = dragElement.getBoundingClientRect().top;
     	let bottomE = dragElement.getBoundingClientRect().bottom;
@@ -343,6 +348,11 @@ document.addEventListener('mousedown', function(event) {
 		}
 	
 		isDragging = false;
+
+		let topC = canvas.getBoundingClientRect().top;
+		let bottomC = canvas.getBoundingClientRect().bottom;
+		let leftC = canvas.getBoundingClientRect().left;
+		let rightC = canvas.getBoundingClientRect().right;
 	
 		let topE = dragElement.getBoundingClientRect().top;
 		let bottomE = dragElement.getBoundingClientRect().bottom;
@@ -425,42 +435,116 @@ let btnClearBoard = document.querySelector('#btn_clean');
 
 btnClearBoard.addEventListener('click', function() {
 	//Удаление всех картинок
+	clearArrayImagesOnCanvas();
+
+	//Очищение формы и инпута НУЖНО ЛИ?
+	/*input.value = '';
+	let newImgDraggable = document.querySelector('.draggableNewImg');
+	newImgDraggable.remove();
+	newImg.setAttribute('src', '../img/default_picture.svg');*/
+});
+
+function clearArrayImagesOnCanvas() {
 	for (let i = 0; i < imagesOnCanvas.length; i++) {
 		imagesOnCanvas[i].remove();
 	}
 	imagesOnCanvas.length = 0;
-
-	//Очищение формы и инпута НУЖНО ЛИ?
-	/*input.value = '';
-
-	let newImgDraggable = document.querySelector('.draggableNewImg');
-	newImgDraggable.remove();
-
-	newImg.setAttribute('src', '../img/default_picture.svg');*/
-
-	//удалить текстовое поле-название доски
-
-	//удалить пины
-});
+}
 //--------------------------------------------------------------------------------------------
 
 
 
 //--------------------------Сохранение картинки-----------------------------------------------
 let btnSaveBoard = document.querySelector('#btn_save');
-// let board = document.querySelector('.board__wrapper');
+let board = document.querySelector('.board__wrapper');
+let boardImages = document.querySelector('.board-image_container');
+let resultModalWindow = document.querySelector('.overlay_with_result');
 
-btnClearBoard.addEventListener('click', function() {
-	// var gh = "https://ih1.redbubble.net/image.109336634.1604/flat,550x550,075,f.u1.jpg"
+btnSaveBoard.addEventListener('click', function() {
+	let context = canvas.getContext("2d");
+	canvas.width = 950;
+	canvas.height = 550;
+	let coordsC = canvas.getBoundingClientRect();
 
-    // let board  = document.createElement('.board__wrapper');
-    // a.href = gh;
-    // board.download = 'image.png';
+	//сортировка и массива imagesOnCanvas
+	for (let i = 0; i < imagesOnCanvas.length; i++) {
+		for (let j = i; j < imagesOnCanvas.length; j++) {
+			if (imagesOnCanvas[i].style.zIndex >= imagesOnCanvas[j].style.zIndex) {
+				let temp = imagesOnCanvas[i];
+				imagesOnCanvas[i] = imagesOnCanvas[j];
+				imagesOnCanvas[j] = temp;
+			}
+		}
+	}
 
-    // board.click()
+	//отрисовка на канвасе фона
+	let backgroundImg = new Image();
+	let startURL = stylesForCanvas[currentStyle].indexOf('(');
+	let finishURL = stylesForCanvas[currentStyle].indexOf(')');
+	let url = stylesForCanvas[currentStyle].slice(startURL + 2, finishURL - 1);
+	backgroundImg.src = url;
+	backgroundImg.style.width = canvas.style.width;
+	backgroundImg.style.height = canvas.style.height;
+	context.drawImage(backgroundImg, 0, 0);
+
+	//и картинок с учетом смещения координат
+	 for (let i = 0; i < imagesOnCanvas.length; i++) {
+		console.log(imagesOnCanvas[i].style.zIndex);
+		let coordsImg = imagesOnCanvas[i].getBoundingClientRect();
+		context.drawImage(imagesOnCanvas[i], parseInt(imagesOnCanvas[i].style.left) - coordsC.left, parseInt(imagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
+	 }
+
+	//display none у всех draggableImagesOnCanvas в board-image_container
+	boardImages.style.display = 'none';
+
+	//всплытие оверлея с подсказкой как сохранить картинку
+	resultModalWindow.style.display = 'flex';
+	interface.style.display = 'none';
+	resultModalWindow.style.zIndex = 3;
+
+	// clearArrayImagesOnCanvas();
 });
 //---------------------------------------------------------------------------------------------
 
 
+//--------------Возвращение обратно к редактированию-------------------------------------------
+let continueBottom = document.querySelector('#continue');
 
+continueBottom.addEventListener('click', function() {
+	let context = canvas.getContext("2d");
+	context.clearRect(0, 0, 950, 550);
+
+	boardImages.style.display = 'flex';
+
+	resultModalWindow.style.display = 'none';
+	interface.style.display = 'flex';
+	resultModalWindow.style.zIndex = -2;
+});
+//---------------------------------------------------------------------------------------------
+
+
+//-------------при резайзе надо двигать все draggable элементы тк они лежат поверх-------------
+window.addEventListener('resize', (e) => {
+	marginNow = container.getBoundingClientRect().left;
+	marginDx = marginNow - marginStart;
+	console.log("marginPrev(" + parseInt(marginStart) + ") - marginStart(" + parseInt(marginNow) + ") = " + marginDx);
+	marginStart = marginNow;
+
+	//Копию передвигаемого изображения кладем поверх newImg
+	if (newImgDraggable) {
+		leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
+		topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
+		newImgDraggable.style.left =leftNewImgDraggable;
+		newImgDraggable.style.top = topNewImgDraggable;
+	}
+
+	boardImagesContainer.childElementCount
+
+	if (boardImagesContainer.hasChildNodes()) {
+		// Таким образом, сначала мы проверяем, не пуст ли объект, есть ли у него дети
+		let children = boardImagesContainer.childNodes;
+		children.forEach(element => element.style.left = parseInt(element.style.left) + marginDx + 'px');
+	  }
+
+});
 
