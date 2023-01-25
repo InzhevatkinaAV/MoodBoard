@@ -6,6 +6,7 @@ let marginDx = 0;
 
 let boardImagesContainer = document.querySelector('.board-image_container');
 let imagesOnCanvas = new Array();
+let countImagesOnCanvas = 0;
 
 //-------------Изменение стиля доски-------------------------------------------------------
 let btnSwitchStyle = document.querySelector('#btn_switch_color');
@@ -26,7 +27,7 @@ btnSwitchStyle.addEventListener('click', function() {
 	//замена вида кнопки для пинов и пинов на соответствующие
 	btnPins.style.background = stylesForBtnPin[currentStyle];
 
-	pinsContainer.childElementCount;
+	// pinsContainer.childElementCount;
 	if (pinsContainer.hasChildNodes()) {
 		let children = pinsContainer.childNodes;
 		children.forEach(element => styleOfPin(element));
@@ -49,9 +50,6 @@ btnSwitchStyle.addEventListener('click', function() {
 			}
 		}
 	}
-
-
-	
 });
 //-----------------------------------------------------------------------------------------
 
@@ -231,6 +229,145 @@ function randomInt(min, max) {
 	return Math.round(rand);
   }
 
+
+//-----добавление палетки----
+let btnPalette = document.querySelector('#btn_color');
+let paletteContainer = document.querySelector('.palette_container');
+
+btnPalette.addEventListener('click', function(event) {
+	let newPalette = document.createElement('input');
+	newPalette.type = "color";
+	newPalette.name="bg";
+	
+	newPalette.style.position = 'absolute';
+	newPalette.style.left = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width / 2 + 'px';
+	newPalette.style.top = canvas.getBoundingClientRect().top + canvas.getBoundingClientRect().height / 2 + 'px';
+	newPalette.classList.add('palette');
+
+	paletteContainer.append(newPalette);
+});
+
+document.addEventListener('mousedown', function(event) {
+	let dragElement = event.target.closest('.palette');
+	if (!dragElement) {
+		return;
+	}
+
+	takeNewImg = false;
+
+	event.preventDefault();
+	dragElement.ondragstart = function() {
+    	return false;
+	};
+
+	let coords, shiftX, shiftY;
+
+  	startDrag(dragElement, event.clientX, event.clientY);
+
+	function onMouseUp(event) {
+		finishDrag();
+	};
+	
+	function onMouseMove(event) {
+		moveAt(event.clientX, event.clientY);
+	}
+
+	function startDrag(element, clientX, clientY) {
+		if(isDragging) {
+		  return;
+		}
+	
+		isDragging = true;
+
+		//Плавно появляется область, перенеся в которую изображение, оно удаляется с доски
+		deleteZone.style.backgroundColor = 'rgba(255, 180, 180, 0.4)';
+		interface.style.zIndex = '-2';
+	
+		document.addEventListener('mousemove', onMouseMove);
+		element.addEventListener('mouseup', onMouseUp);
+	
+		shiftX = clientX - element.getBoundingClientRect().left;
+		shiftY = clientY - element.getBoundingClientRect().top;
+	
+		element.style.position = 'fixed';
+
+		moveAt(clientX, clientY);
+	};
+
+	function finishDrag() {   
+		if(!isDragging) {
+		  return;
+		}
+	
+		isDragging = false;
+
+		let topC = canvas.getBoundingClientRect().top;
+		let bottomC = canvas.getBoundingClientRect().bottom;
+		let leftC = canvas.getBoundingClientRect().left;
+		let rightC = canvas.getBoundingClientRect().right;
+	
+		let topE = dragElement.getBoundingClientRect().top;
+		let bottomE = dragElement.getBoundingClientRect().bottom;
+		let leftE = dragElement.getBoundingClientRect().left;
+		let rightE = dragElement.getBoundingClientRect().right;
+	
+		if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) { //когда попадаем в канвас
+		  	dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
+		} else { 
+			if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) { //когда отпускаем изображение полностью за пределами канваса, оно удаляется
+				dragElement.remove();
+			} else { //когда отпускаем изображение частично  за пределами канваса, оно возвращается на канвас
+				dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
+				dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
+			}
+		}
+	
+		document.removeEventListener('mousemove', onMouseMove);
+		dragElement.removeEventListener('mouseup', onMouseUp);
+
+		deleteZone.style.backgroundColor = 'rgba(255, 180, 180, 0)';
+		interface.style.zIndex = '0';
+	}
+	
+	function moveAt(clientX, clientY) {
+		
+		let newX = clientX - shiftX;
+		let newY = clientY - shiftY;
+	
+		let newBottom = newY + dragElement.offsetHeight;
+	
+		if (newBottom > document.documentElement.clientHeight) {
+			let docBottom = document.documentElement.getBoundingClientRect().bottom;
+	
+			let scrollY = Math.min(docBottom - newBottom, 10);
+
+			if (scrollY < 0) scrollY = 0;
+	
+			window.scrollBy(0, scrollY);
+	
+			newY = Math.min(newY, document.documentElement.clientHeight - dragElement.offsetHeight);
+		}
+	
+		if (newY < 0) {
+			  let scrollY = Math.min(-newY, 10);
+			  if (scrollY < 0) scrollY = 0;
+	
+			  window.scrollBy(0, -scrollY);
+			  newY = Math.max(newY, 0);
+		}
+	
+	
+		if (newX < 0) newX = 0;
+		if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
+			  newX = document.documentElement.clientWidth - dragElement.offsetWidth;
+		}
+	
+		dragElement.style.left = newX + 'px';
+		dragElement.style.top = newY + 'px';		
+	}
+	
+});
+//---------------------------
 
 //для изменения z-индекса
 function zIndexChange(obj, num) {
@@ -644,6 +781,7 @@ let btnClearBoard = document.querySelector('#btn_clean');
 btnClearBoard.addEventListener('click', function() {
 	clearArrayImages();
 	clearArrayPins();
+	clearArrayPalette();
 
 	//Очищение формы и инпута НУЖНО ЛИ?
 	/*input.value = '';
@@ -653,10 +791,10 @@ btnClearBoard.addEventListener('click', function() {
 });
 
 function clearArrayImages() {
-	boardImagesContainer.childElementCount;
+	// boardImagesContainer.childElementCount;
 	if (boardImagesContainer.hasChildNodes()) {
 		let children = boardImagesContainer.childNodes;
-		while (boardImagesContainer.childNodes.length > 0) {
+		while (children.length > 0) {
 			children[0].remove();
 		}
 	}
@@ -668,15 +806,24 @@ function clearArrayImages() {
 }
 
 function clearArrayPins() {
-	pinsContainer.childElementCount;
+	// pinsContainer.childElementCount;
 	if (pinsContainer.hasChildNodes()) {
 		let children = pinsContainer.childNodes;
-		while (pinsContainer.childNodes.length > 0) {
+		while (children.length > 0) {
 			children[0].remove();
 		}
 	}
 }
 
+function clearArrayPalette() {
+	// paletteContainer.childElementCount;
+	if (paletteContainer.hasChildNodes()) {
+		let children = paletteContainer.childNodes;
+		while (children.length > 0) {
+			children[0].remove();
+		}
+	}
+}
 //--------------------------------------------------------------------------------------------
 
 
@@ -686,6 +833,7 @@ let btnSaveBoard = document.querySelector('#btn_save');
 let board = document.querySelector('.board__wrapper');
 let boardImages = document.querySelector('.board-image_container');
 let resultModalWindow = document.querySelector('.overlay_with_result');
+let paletteImgContainer = document.querySelector('.palette_img_container');
 
 btnSaveBoard.addEventListener('click', function() {
 	let context = canvas.getContext("2d");
@@ -720,8 +868,26 @@ btnSaveBoard.addEventListener('click', function() {
 		context.drawImage(imagesOnCanvas[i], parseInt(imagesOnCanvas[i].style.left) - coordsC.left, parseInt(imagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
 	}
 
+	//палеток
+	if (paletteContainer.hasChildNodes()) {
+		let children = paletteContainer.childNodes;
+		for (let i = 0; i < children.length; i++) {
+			context.beginPath();
+			context.rect(parseInt(children[i].style.left) - coordsC.left, parseInt(children[i].style.top) - coordsC.top, 70.6, 70.6);
+			context.fillStyle = "#eeeeee";
+			context.fill();
+
+			context.beginPath();
+			context.rect(parseInt(children[i].style.left) + 5 - coordsC.left, parseInt(children[i].style.top) + 5 - coordsC.top, 60, 60);
+			context.fillStyle = children[i].value;
+			context.fill();
+			context.lineWidth = 0.3;
+			context.stroke();
+		}
+	}
+
 	//и пинов с учетом смещения координат
-	pinsContainer.childElementCount;
+	// pinsContainer.childElementCount;
 	if (pinsContainer.hasChildNodes()) {
 		let children = pinsContainer.childNodes;
 		children.forEach(element => context.drawImage(element, parseInt(element.style.left) - coordsC.left, parseInt(element.style.top) - coordsC.top, parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top)));
@@ -730,6 +896,7 @@ btnSaveBoard.addEventListener('click', function() {
 	//display none у всех элементов на канвасе
 	boardImages.style.display = 'none';
 	pinsContainer.style.display = 'none';
+	paletteContainer.style.display = 'none';
 
 	//всплытие оверлея с подсказкой как сохранить картинку
 	resultModalWindow.style.display = 'flex';
@@ -748,6 +915,7 @@ continueBottom.addEventListener('click', function() {
 
 	boardImages.style.display = 'flex';
 	pinsContainer.style.display = 'flex';
+	paletteContainer.style.display = 'flex';
 
 	resultModalWindow.style.display = 'none';
 	interface.style.display = 'flex';
@@ -780,9 +948,15 @@ window.addEventListener('resize', (e) => {
 	}
 
 	//двигаем картинки
-	boardImagesContainer.childElementCount;
+	// boardImagesContainer.childElementCount;
 	if (boardImagesContainer.hasChildNodes()) {
 		let children = boardImagesContainer.childNodes;
+		children.forEach(element => element.style.left = parseInt(element.style.left) + marginDx + 'px');
+	}
+
+	//двигаем палетки
+	if (paletteContainer.hasChildNodes()) {
+		let children = paletteContainer.childNodes;
 		children.forEach(element => element.style.left = parseInt(element.style.left) + marginDx + 'px');
 	  }
 

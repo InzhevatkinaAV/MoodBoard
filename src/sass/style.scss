@@ -70,6 +70,19 @@ header {
                 object-fit: contain;
                 position: absolute;
             }
+            .palette_container {
+                z-index: 999;
+                .palette {
+                    z-index: 999;
+                    position: absolute;
+                    margin: 0;
+                    padding: 7;
+                    background-color: #eeeeee;
+                    width: 70px;
+                    height: 70px;
+                    border: none;
+                }
+            } 
         }
     
         .interface {
@@ -125,35 +138,29 @@ header {
                 justify-content: space-between;
                 align-items: center;
                 button {
+                    border: none;
+                    transition: 0.5s all;
+                    filter: contrast(90%);
                     width: 115px;
                     height: 115px;
                     &:focus {
                         outline: none;
                     }
-                }
-                #btn_switch_color {
-                    border: none;
-                    background: url("../img/btnStyle/cork_style.jpg") center center/cover no-repeat;
-                    transition: 0.5s all;
-                    filter: contrast(90%);
                     &:hover {
                         border: none;
                         box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.25);
                         padding: 0;
                         filter: contrast(100%);
                     }
+                }
+                #btn_switch_color {     
+                    background: url("../img/btnStyle/cork_style.jpg") center center/cover no-repeat;
                 }
                 #btn_pins {
-                    border: none;
                     background: url("../img/btnStyle/white_style_pin.jpg") center center/cover no-repeat;
-                    transition: 0.5s all;
-                    filter: contrast(90%);
-                    &:hover {
-                        border: none;
-                        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.25);
-                        padding: 0;
-                        filter: contrast(100%);
-                    }
+                }
+                #btn_color {
+                    background: url("../img/btnStyle/palette.jpg") center center/cover no-repeat;
                 }
             }
 
