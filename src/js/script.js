@@ -289,6 +289,7 @@ document.addEventListener('mousedown', function(event) {
 		return;
 	}
 
+	zIndex = dragElement.style.zIndex;
 	zIndexChange(dragElement, 2);
 
 	takeNewImg = false;
@@ -375,7 +376,7 @@ document.addEventListener('mousedown', function(event) {
 
 		if (previousDraggingOnCanvas && previousDraggingOnCanvas != dragElement) {
 		 	imagesOnCanvas.forEach((item) => {
-		 		if (item.style.zIndex > 0) {
+		 		if (item.style.zIndex > 0 && item.style.zIndex >= zIndex) {
 		 			item.style.zIndex = item.style.zIndex - 1;
 		 		}
 					
@@ -489,7 +490,6 @@ btnSaveBoard.addEventListener('click', function() {
 
 	//и картинок с учетом смещения координат
 	 for (let i = 0; i < imagesOnCanvas.length; i++) {
-		console.log(imagesOnCanvas[i].style.zIndex);
 		let coordsImg = imagesOnCanvas[i].getBoundingClientRect();
 		context.drawImage(imagesOnCanvas[i], parseInt(imagesOnCanvas[i].style.left) - coordsC.left, parseInt(imagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
 	 }
@@ -501,8 +501,6 @@ btnSaveBoard.addEventListener('click', function() {
 	resultModalWindow.style.display = 'flex';
 	interface.style.display = 'none';
 	resultModalWindow.style.zIndex = 3;
-
-	// clearArrayImagesOnCanvas();
 });
 //---------------------------------------------------------------------------------------------
 
@@ -519,6 +517,14 @@ continueBottom.addEventListener('click', function() {
 	resultModalWindow.style.display = 'none';
 	interface.style.display = 'flex';
 	resultModalWindow.style.zIndex = -2;
+
+	if (newImgDraggable) {
+		newImgDraggable.style.position = 'absolute';
+		leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
+		topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
+		newImgDraggable.style.left =leftNewImgDraggable;
+		newImgDraggable.style.top = topNewImgDraggable;
+	}
 });
 //---------------------------------------------------------------------------------------------
 
@@ -527,18 +533,18 @@ continueBottom.addEventListener('click', function() {
 window.addEventListener('resize', (e) => {
 	marginNow = container.getBoundingClientRect().left;
 	marginDx = marginNow - marginStart;
-	console.log("marginPrev(" + parseInt(marginStart) + ") - marginStart(" + parseInt(marginNow) + ") = " + marginDx);
 	marginStart = marginNow;
 
 	//Копию передвигаемого изображения кладем поверх newImg
 	if (newImgDraggable) {
+		newImgDraggable.style.position = 'absolute';
 		leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
 		topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
 		newImgDraggable.style.left =leftNewImgDraggable;
 		newImgDraggable.style.top = topNewImgDraggable;
 	}
 
-	boardImagesContainer.childElementCount
+	boardImagesContainer.childElementCount;
 
 	if (boardImagesContainer.hasChildNodes()) {
 		// Таким образом, сначала мы проверяем, не пуст ли объект, есть ли у него дети
@@ -547,4 +553,3 @@ window.addEventListener('resize', (e) => {
 	  }
 
 });
-
