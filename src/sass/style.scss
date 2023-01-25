@@ -7,7 +7,7 @@
 }
 
 html { 
-    // overflow:  hidden; 
+    overflow:  hidden; 
 }
 
 .container {
@@ -62,6 +62,11 @@ header {
             .draggableNewImg {
                 max-height: 220px;
                 max-width: 330px;
+                object-fit: contain;
+                position: absolute;
+            }
+            .pin {
+                z-index: 1000;
                 object-fit: contain;
                 position: absolute;
             }
@@ -129,6 +134,18 @@ header {
                 #btn_switch_color {
                     border: none;
                     background: url("../img/btnStyle/cork_style.jpg") center center/cover no-repeat;
+                    transition: 0.5s all;
+                    filter: contrast(90%);
+                    &:hover {
+                        border: none;
+                        box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.25);
+                        padding: 0;
+                        filter: contrast(100%);
+                    }
+                }
+                #btn_pins {
+                    border: none;
+                    background: url("../img/btnStyle/white_style_pin.jpg") center center/cover no-repeat;
                     transition: 0.5s all;
                     filter: contrast(90%);
                     &:hover {

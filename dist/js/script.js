@@ -22,8 +22,215 @@ btnSwitchStyle.addEventListener('click', function() {
 
 	btnSwitchStyle.style.background = stylesForBtn[currentStyle];
 	canvas.style.background = stylesForCanvas[currentStyle];
+
+	//замена вида кнопки для пинов и пинов на соответствующие
+	btnPins.style.background = stylesForBtnPin[currentStyle];
+
+	pinsContainer.childElementCount;
+	if (pinsContainer.hasChildNodes()) {
+		let children = pinsContainer.childNodes;
+		children.forEach(element => styleOfPin(element));
+
+		let canvasCoord = canvas.getBoundingClientRect();
+
+		for (let i = 0; i < children.length; i++) {
+			let pinCoord = children[i].getBoundingClientRect();
+			if (pinCoord.left < canvasCoord.left) {
+				children[i].style.left = canvasCoord.left;
+			}
+			if (pinCoord.top < canvasCoord.top) {
+				children[i].style.top = canvasCoord.top;
+			}
+			if (pinCoord.right > canvasCoord.right) {
+				children[i].style.left = parseInt(pinCoord.left) - (parseInt(pinCoord.right) - parseInt(canvasCoord.right)) + 'px';
+			}
+			if (pinCoord.bottom > canvasCoord.bottom) {
+				children[i].style.top = parseInt(pinCoord.top) - (parseInt(pinCoord.bottom) - parseInt(canvasCoord.bottom)) + 'px';
+			}
+		}
+	}
+
+
+	
 });
 //-----------------------------------------------------------------------------------------
+
+
+//-----Добавление пинов на доску---------
+let btnPins = document.querySelector('#btn_pins');
+let pinsContainer = document.querySelector('.board-pins_container');
+
+let stylesForBtnPin = ['url("../img/btnStyle/white_style_pin.jpg") center center/cover no-repeat',
+						'url("../img/btnStyle/cork_style_pin.jpg") center center/cover no-repeat',
+						'url("../img/btnStyle/graphite_style_pin.jpg") center center/cover no-repeat'];
+
+let pinWhiteBoard = "../img/pins/pin1_style3.png";
+let pinCorkBoard = ["../img/pins/pin1_style1.png", "../img/pins/pin2_style1.png", 
+					"../img/pins/pin3_style1.png", "../img/pins/pin4_style1.png",
+					"../img/pins/pin5_style1.png"];
+let pinGraphiteBoard = ["../img/pins/pin1_style2.png", "../img/pins/pin2_style2.png", 
+					"../img/pins/pin3_style2.png", "../img/pins/pin4_style2.png",
+					"../img/pins/pin5_style2.png"];
+
+btnPins.addEventListener('click', function() {
+	let newPin = document.createElement('img');
+	
+	styleOfPin(newPin);
+
+	newPin.style.position = 'absolute';
+	newPin.style.left = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width / 2 + 'px';
+	newPin.style.top = canvas.getBoundingClientRect().top + canvas.getBoundingClientRect().height / 2 + 'px';
+	newPin.classList.add('pin');
+
+	pinsContainer.append(newPin);
+});
+
+function styleOfPin(pin) {
+	let maxWidth = '50px';
+
+	switch (currentStyle) {
+		case 0: 
+			pin.setAttribute('src', pinWhiteBoard);
+			break;
+		case 1: 
+			pin.setAttribute('src', pinCorkBoard[randomInt(0, 4)]); 
+			break;
+		case 2:
+			pin.setAttribute('src', pinGraphiteBoard[randomInt(0, 4)]); 
+			maxWidth = '100px';
+			break;
+	}
+	pin.style.maxWidth = maxWidth;
+}
+
+//перемещение пинов на доске
+document.addEventListener('mousedown', function(event) {
+	let dragElement = event.target.closest('.pin');
+	if (!dragElement) {
+		return;
+	}
+
+	takeNewImg = false;
+
+	event.preventDefault();
+	dragElement.ondragstart = function() {
+    	return false;
+	};
+
+	let coords, shiftX, shiftY;
+
+  	startDrag(dragElement, event.clientX, event.clientY);
+
+	function onMouseUp(event) {
+		finishDrag();
+	};
+	
+	function onMouseMove(event) {
+		moveAt(event.clientX, event.clientY);
+	}
+
+	function startDrag(element, clientX, clientY) {
+		if(isDragging) {
+		  return;
+		}
+	
+		isDragging = true;
+
+		//Плавно появляется область, перенеся в которую изображение, оно удаляется с доски
+		deleteZone.style.backgroundColor = 'rgba(255, 180, 180, 0.4)';
+		interface.style.zIndex = '-2';
+	
+		document.addEventListener('mousemove', onMouseMove);
+		element.addEventListener('mouseup', onMouseUp);
+	
+		shiftX = clientX - element.getBoundingClientRect().left;
+		shiftY = clientY - element.getBoundingClientRect().top;
+	
+		element.style.position = 'fixed';
+
+		moveAt(clientX, clientY);
+	};
+
+	function finishDrag() {   
+		if(!isDragging) {
+		  return;
+		}
+	
+		isDragging = false;
+
+		let topC = canvas.getBoundingClientRect().top;
+		let bottomC = canvas.getBoundingClientRect().bottom;
+		let leftC = canvas.getBoundingClientRect().left;
+		let rightC = canvas.getBoundingClientRect().right;
+	
+		let topE = dragElement.getBoundingClientRect().top;
+		let bottomE = dragElement.getBoundingClientRect().bottom;
+		let leftE = dragElement.getBoundingClientRect().left;
+		let rightE = dragElement.getBoundingClientRect().right;
+	
+		if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) { //когда попадаем в канвас
+		  	dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
+		} else { 
+			if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) { //когда отпускаем изображение полностью за пределами канваса, оно удаляется
+				dragElement.remove();
+			} else { //когда отпускаем изображение частично  за пределами канваса, оно возвращается на канвас
+				dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
+				dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
+			}
+		}
+	
+		document.removeEventListener('mousemove', onMouseMove);
+		dragElement.removeEventListener('mouseup', onMouseUp);
+
+		deleteZone.style.backgroundColor = 'rgba(255, 180, 180, 0)';
+		interface.style.zIndex = '0';
+	}
+	
+	function moveAt(clientX, clientY) {
+		
+		let newX = clientX - shiftX;
+		let newY = clientY - shiftY;
+	
+		let newBottom = newY + dragElement.offsetHeight;
+	
+		if (newBottom > document.documentElement.clientHeight) {
+			let docBottom = document.documentElement.getBoundingClientRect().bottom;
+	
+			let scrollY = Math.min(docBottom - newBottom, 10);
+
+			if (scrollY < 0) scrollY = 0;
+	
+			window.scrollBy(0, scrollY);
+	
+			newY = Math.min(newY, document.documentElement.clientHeight - dragElement.offsetHeight);
+		}
+	
+		if (newY < 0) {
+			  let scrollY = Math.min(-newY, 10);
+			  if (scrollY < 0) scrollY = 0;
+	
+			  window.scrollBy(0, -scrollY);
+			  newY = Math.max(newY, 0);
+		}
+	
+	
+		if (newX < 0) newX = 0;
+		if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
+			  newX = document.documentElement.clientWidth - dragElement.offsetWidth;
+		}
+	
+		dragElement.style.left = newX + 'px';
+		dragElement.style.top = newY + 'px';		
+	}
+	
+});
+//--------------------------------------
+
+function randomInt(min, max) {
+	let rand = min - 0.5 + Math.random() * (max - min + 1);
+	return Math.round(rand);
+  }
+
 
 //для изменения z-индекса
 function zIndexChange(obj, num) {
@@ -376,7 +583,7 @@ document.addEventListener('mousedown', function(event) {
 
 		if (previousDraggingOnCanvas && previousDraggingOnCanvas != dragElement) {
 		 	imagesOnCanvas.forEach((item) => {
-		 		if (item.style.zIndex > 0 && item.style.zIndex >= zIndex) {
+		 		if (item.style.zIndex > 0 && item.style.zIndex > zIndex) {
 		 			item.style.zIndex = item.style.zIndex - 1;
 		 		}
 					
@@ -435,8 +642,8 @@ document.addEventListener('mousedown', function(event) {
 let btnClearBoard = document.querySelector('#btn_clean');
 
 btnClearBoard.addEventListener('click', function() {
-	//Удаление всех картинок
-	clearArrayImagesOnCanvas();
+	clearArrayImages();
+	clearArrayPins();
 
 	//Очищение формы и инпута НУЖНО ЛИ?
 	/*input.value = '';
@@ -445,12 +652,31 @@ btnClearBoard.addEventListener('click', function() {
 	newImg.setAttribute('src', '../img/default_picture.svg');*/
 });
 
-function clearArrayImagesOnCanvas() {
+function clearArrayImages() {
+	boardImagesContainer.childElementCount;
+	if (boardImagesContainer.hasChildNodes()) {
+		let children = boardImagesContainer.childNodes;
+		while (boardImagesContainer.childNodes.length > 0) {
+			children[0].remove();
+		}
+	}
+
 	for (let i = 0; i < imagesOnCanvas.length; i++) {
 		imagesOnCanvas[i].remove();
 	}
 	imagesOnCanvas.length = 0;
 }
+
+function clearArrayPins() {
+	pinsContainer.childElementCount;
+	if (pinsContainer.hasChildNodes()) {
+		let children = pinsContainer.childNodes;
+		while (pinsContainer.childNodes.length > 0) {
+			children[0].remove();
+		}
+	}
+}
+
 //--------------------------------------------------------------------------------------------
 
 
@@ -489,13 +715,21 @@ btnSaveBoard.addEventListener('click', function() {
 	context.drawImage(backgroundImg, 0, 0);
 
 	//и картинок с учетом смещения координат
-	 for (let i = 0; i < imagesOnCanvas.length; i++) {
+	for (let i = 0; i < imagesOnCanvas.length; i++) {
 		let coordsImg = imagesOnCanvas[i].getBoundingClientRect();
 		context.drawImage(imagesOnCanvas[i], parseInt(imagesOnCanvas[i].style.left) - coordsC.left, parseInt(imagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
-	 }
+	}
 
-	//display none у всех draggableImagesOnCanvas в board-image_container
+	//и пинов с учетом смещения координат
+	pinsContainer.childElementCount;
+	if (pinsContainer.hasChildNodes()) {
+		let children = pinsContainer.childNodes;
+		children.forEach(element => context.drawImage(element, parseInt(element.style.left) - coordsC.left, parseInt(element.style.top) - coordsC.top, parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top)));
+	}
+
+	//display none у всех элементов на канвасе
 	boardImages.style.display = 'none';
+	pinsContainer.style.display = 'none';
 
 	//всплытие оверлея с подсказкой как сохранить картинку
 	resultModalWindow.style.display = 'flex';
@@ -513,6 +747,7 @@ continueBottom.addEventListener('click', function() {
 	context.clearRect(0, 0, 950, 550);
 
 	boardImages.style.display = 'flex';
+	pinsContainer.style.display = 'flex';
 
 	resultModalWindow.style.display = 'none';
 	interface.style.display = 'flex';
@@ -544,12 +779,18 @@ window.addEventListener('resize', (e) => {
 		newImgDraggable.style.top = topNewImgDraggable;
 	}
 
+	//двигаем картинки
 	boardImagesContainer.childElementCount;
-
 	if (boardImagesContainer.hasChildNodes()) {
-		// Таким образом, сначала мы проверяем, не пуст ли объект, есть ли у него дети
 		let children = boardImagesContainer.childNodes;
 		children.forEach(element => element.style.left = parseInt(element.style.left) + marginDx + 'px');
 	  }
+
+	//двигаем пины
+	pinsContainer.childElementCount;
+	if (pinsContainer.hasChildNodes()) {
+		let children = pinsContainer.childNodes;
+		children.forEach(element => element.style.left = parseInt(element.style.left) + marginDx + 'px');
+	}
 
 });
