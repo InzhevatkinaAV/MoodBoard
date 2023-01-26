@@ -563,11 +563,17 @@ document.addEventListener('mousedown', function(event) {
                 if (typeOfDragElement != "draggableNewImg") {
                     dragElement.remove();
                 } else {
-                    dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
-				    dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
+					if (typeOfDragElement == "pin" || typeOfDragElement == "palette") {
+						dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
+						dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
+					} else {
+						
+						dragElement.style.left = leftC + 15 + 'px';
+						   dragElement.style.top = topC + 15 + 'px';
+					}
                 }
 			} else {
-                if (typeOfDragElement != "draggableNewImg" || typeOfDragElement != "onboardImg") {
+                if (typeOfDragElement == "pin" || typeOfDragElement == "palette") {
                     dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
 				    dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
                 } else {

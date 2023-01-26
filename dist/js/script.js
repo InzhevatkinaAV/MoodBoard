@@ -8,7 +8,7 @@ let marginStart = container.getBoundingClientRect().left;
 let marginNow = container.getBoundingClientRect().left;
 let marginDx = 0;
 
-//-------------Изменение стиля доски-------------------------------------------------------
+//-------------------------------------Изменение стиля доски-------------------------------------------
 const btnSwitchStyle = document.querySelector('#btn_switch_color');
 
 const stylesForBtn = ['url("../img/btnStyle/cork_style.jpg") center center/cover no-repeat',
@@ -52,10 +52,10 @@ btnSwitchStyle.addEventListener('click', function() {
 		}
 	}
 });
-//-----------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------
 
 
-//-------------------------Добавление пинов на доску---------------------------------------
+//-------------------------------------Добавление пинов на доску---------------------------------------
 const btnPins = document.querySelector('#btn_pins');
 const pinsContainer = document.querySelector('.board-pins_container');
 
@@ -102,19 +102,16 @@ function styleOfPin(pin) {
 	pin.style.maxWidth = maxWidth;
 }
 
-//!!!перемещение пинов на доске
-
-
 function randomInt(min, max) {
 	let rand = min - 0.5 + Math.random() * (max - min + 1);
 	return Math.round(rand);
   }
-  //---------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------
 
 
-//------------------------------добавление палетки----------------------------------------
-let btnPalette = document.querySelector('#btn_color');
-let paletteContainer = document.querySelector('.palette_container');
+//------------------------------Добавление палетки на доску--------------------------------------------
+const btnPalette = document.querySelector('#btn_color');
+const paletteContainer = document.querySelector('.palette_container');
 
 btnPalette.addEventListener('click', function(event) {
 	let newPalette = document.createElement('input');
@@ -128,27 +125,19 @@ btnPalette.addEventListener('click', function(event) {
 
 	paletteContainer.append(newPalette);
 });
+//----------------------------------------------------------------------------------------------------
 
-//!!!
 
-//----------------------------------------------------------------------------------------
-
-//для изменения z-индекса
-function zIndexChange(obj, num) {
-	obj.style.zIndex = boardImagesContainer.childElementCount + num;
-}
-
-//-------------Взятие изображения по url---------------------------------------------------
-let input = document.querySelector('#new_image-url');
-let form = document.querySelector('#form_new_image-url');
-let newImg = document.querySelector('#new_image');
-let newImgDraggable, leftNewImgDraggable, topNewImgDraggable; //копия newImg, которая будет лежать поверх, для многократного перемещения одной и той же картинки
-let newImgWrapper = document.querySelector('#new_image__wrapper');
+//-------------------------Взятие изображения по url---------------------------------------------------
+const input = document.querySelector('#new_image-url');
+const form = document.querySelector('#form_new_image-url');
+const newImg = document.querySelector('#new_image');
+const newImgWrapper = document.querySelector('#new_image__wrapper');
+let newImgDraggable, leftNewImgDraggable, topNewImgDraggable;
 
 form.addEventListener('submit', function(e) {
     e.preventDefault();
 
-	//удаляем копию предыдущего фото, если она есть (т.е. если в форме не дефолтные картинки)
 	try {
 		let previous = document.querySelector('.draggableNewImg');
 		newImgWrapper.removeChild(previous);
@@ -167,7 +156,6 @@ form.addEventListener('submit', function(e) {
             img => { 
             	newImg.setAttribute('src', input.value);
 				
-				//поверх кладем фото, которое можно перетаскивать
 				newImgDraggable.setAttribute('src', input.value);
 				newImgDraggable.style.maxHeight = '220px';
 				newImgDraggable.style.maxWidth = '330px'
@@ -205,39 +193,13 @@ function loadImage(src) {
     });
 }
 
-//Удобно ли?
 input.addEventListener('dblclick', function() {
 	input.value = '';
 });
-//----------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------
 
 
-
-//------Перетаскивание изображения на канвас----------------------------------------------
-const boardImagesContainer = document.querySelector('.board-image_container');
-let isDragging = false;
-//!!!
-
-//-----------------------------------------------------------------------------------------
-
-
-
-//------------------Перетаскивание изображения внутри канваса-----------------------------
-let isDraggingOnCanvas = false;
-let previousDraggingOnCanvas;
-let takeNewImg = false;
-
-//для удаления
-let deleteZone = document.querySelector('.overlay');
-let interface = document.querySelector('.interface');
-
-//!!!
-
-//----------------------------------------------------------------------------------------
-
-
-
-//---------------------------Очищение канваса---------------------------------------------
+//-----------------------------------------Очищение канваса---------------------------------------------
 let btnClearBoard = document.querySelector('#btn_clean');
 
 btnClearBoard.addEventListener('click', function() {
@@ -272,16 +234,13 @@ function clearArrayPalette() {
 		}
 	}
 }
-//--------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------
 
 
-
-//--------------------------Сохранение картинки-----------------------------------------
-let btnSaveBoard = document.querySelector('#btn_save');
-let board = document.querySelector('.board__wrapper');
-let boardImages = document.querySelector('.board-image_container');
-let resultModalWindow = document.querySelector('.overlay_with_result');
-let paletteImgContainer = document.querySelector('.palette_img_container');
+//-------------------------------------Сохранение мудборда----------------------------------------------
+const btnSaveBoard = document.querySelector('#btn_save');
+const resultModalWindow = document.querySelector('.overlay_with_result');
+const paletteImgContainer = document.querySelector('.palette_img_container');
 
 btnSaveBoard.addEventListener('click', function() {
 	canvas.width = CANVAS_WIDTH;
@@ -289,7 +248,6 @@ btnSaveBoard.addEventListener('click', function() {
 
 	let coordsC = canvas.getBoundingClientRect();
 
-	//отрисовка на канвасе фона
 	let backgroundImg = new Image();
 	let startURL = stylesForCanvas[currentStyle].indexOf('(');
 	let finishURL = stylesForCanvas[currentStyle].indexOf(')');
@@ -304,7 +262,6 @@ btnSaveBoard.addEventListener('click', function() {
 		img => {
 			context.drawImage(backgroundImg, 0, 0);
 
-			// картинок с учетом смещения координат и z-слоев
 			if (boardImagesContainer.hasChildNodes()) {
 				let children = boardImagesContainer.childNodes;
 				let imagesOnCanvas = [];
@@ -312,11 +269,12 @@ btnSaveBoard.addEventListener('click', function() {
 				let sortedImagesOnCanvas = mergeSort(imagesOnCanvas);
 				for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
 					let coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
-					context.drawImage(sortedImagesOnCanvas[i], parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left, parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
+					context.drawImage(sortedImagesOnCanvas[i], parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left, 
+										parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top, 
+										parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
 				}
 			}
 
-			//палеток
 			if (paletteContainer.hasChildNodes()) {
 				let children = paletteContainer.childNodes;
 				for (let i = 0; i < children.length; i++) {
@@ -334,18 +292,18 @@ btnSaveBoard.addEventListener('click', function() {
 				}
 			}
 
-			//и пинов с учетом смещения координат
 			if (pinsContainer.hasChildNodes()) {
 				let children = pinsContainer.childNodes;
-				children.forEach(element => context.drawImage(element, parseInt(element.style.left) - coordsC.left, parseInt(element.style.top) - coordsC.top, parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top)));
+				children.forEach(element => {context.drawImage(element, parseInt(element.style.left) - coordsC.left, 
+												parseInt(element.style.top) - coordsC.top, 
+												parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), 
+												parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top))});
 			}
 
-			//display none у всех элементов на канвасе
-			boardImages.style.display = 'none';
+			boardImagesContainer.style.display = 'none';
 			pinsContainer.style.display = 'none';
 			paletteContainer.style.display = 'none';
 
-			//всплытие оверлея с подсказкой как сохранить картинку
 			resultModalWindow.style.display = 'flex';
 			interface.style.display = 'none';
 			resultModalWindow.style.zIndex = 3;
@@ -385,17 +343,17 @@ function merge(arrayPart1, arrayPart2) {
 
     return [...arraySort, ...arrayPart1.slice(i), ...arrayPart2.slice(j)];
 };
-//---------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------
 
 
-//--------------Возвращение обратно к редактированию----------------------------------
+//------------------------Возвращение в режим редактирования доски---------------------------------------
 let continueBottom = document.querySelector('#continue');
 
 continueBottom.addEventListener('click', function() {
 	let context = canvas.getContext("2d");
 	context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-	boardImages.style.display = 'flex';
+	boardImagesContainer.style.display = 'flex';
 	pinsContainer.style.display = 'flex';
 	paletteContainer.style.display = 'flex';
 
@@ -411,16 +369,15 @@ continueBottom.addEventListener('click', function() {
 		newImgDraggable.style.top = topNewImgDraggable;
 	}
 });
-//----------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------------------------------
 
 
-//-----------при резайзе надо двигать все draggable элементы тк они лежат поверх-----------
+//-------------------------------------Смещения при резайзе страницы------------------------------------
 window.addEventListener('resize', (e) => {
 	marginNow = container.getBoundingClientRect().left;
 	marginDx = marginNow - marginStart;
 	marginStart = marginNow;
 
-	//Копию передвигаемого изображения кладем поверх newImg
 	if (newImgDraggable) {
 		newImgDraggable.style.position = 'absolute';
 		leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
@@ -429,20 +386,16 @@ window.addEventListener('resize', (e) => {
 		newImgDraggable.style.top = topNewImgDraggable;
 	}
 
-	//двигаем картинки
-	// boardImagesContainer.childElementCount;
 	if (boardImagesContainer.hasChildNodes()) {
 		let children = boardImagesContainer.childNodes;
 		children.forEach(element => element.style.left = parseInt(element.style.left) + marginDx + 'px');
 	}
 
-	//двигаем палетки
 	if (paletteContainer.hasChildNodes()) {
 		let children = paletteContainer.childNodes;
 		children.forEach(element => element.style.left = parseInt(element.style.left) + marginDx + 'px');
 	  }
 
-	//двигаем пины
 	pinsContainer.childElementCount;
 	if (pinsContainer.hasChildNodes()) {
 		let children = pinsContainer.childNodes;
@@ -450,7 +403,19 @@ window.addEventListener('resize', (e) => {
 	}
 
 });
+//------------------------------------------------------------------------------------------------------
 
+
+//----------------------------------Перемещение изображений----------------------------------------------
+const boardImagesContainer = document.querySelector('.board-image_container');
+const deleteZone = document.querySelector('.overlay');
+const interface = document.querySelector('.interface');
+
+let isDragging = false;
+
+function zIndexChange(obj, num) {
+	obj.style.zIndex = boardImagesContainer.childElementCount + num;
+}
 
 document.addEventListener('mousedown', function(event) {
 	let dragElement = event.target.closest('.pin');
@@ -470,7 +435,6 @@ document.addEventListener('mousedown', function(event) {
             }
         }
 	}
-
 
     if (typeOfDragElement == "onboardImg") {
         zIndex = dragElement.style.zIndex;
@@ -563,11 +527,17 @@ document.addEventListener('mousedown', function(event) {
                 if (typeOfDragElement != "draggableNewImg") {
                     dragElement.remove();
                 } else {
-                    dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
-				    dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
+					if (typeOfDragElement == "pin" || typeOfDragElement == "palette") {
+						dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
+						dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
+					} else {
+						
+						dragElement.style.left = leftC + 15 + 'px';
+						   dragElement.style.top = topC + 15 + 'px';
+					}
                 }
 			} else {
-                if (typeOfDragElement != "draggableNewImg" || typeOfDragElement != "onboardImg") {
+                if (typeOfDragElement == "pin" || typeOfDragElement == "palette") {
                     dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
 				    dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
                 } else {
@@ -626,7 +596,6 @@ document.addEventListener('mousedown', function(event) {
 			  newY = Math.max(newY, 0);
 		}
 	
-	
 		if (newX < 0) newX = 0;
 		if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
 			  newX = document.documentElement.clientWidth - dragElement.offsetWidth;
@@ -634,6 +603,6 @@ document.addEventListener('mousedown', function(event) {
 	
 		dragElement.style.left = newX + 'px';
 		dragElement.style.top = newY + 'px';		
-	}
-	
+	}	
 });
+//------------------------------------------------------------------------------------------------------
