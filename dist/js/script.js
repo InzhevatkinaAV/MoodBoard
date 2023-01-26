@@ -6,6 +6,7 @@ let marginDx = 0;
 
 let boardImagesContainer = document.querySelector('.board-image_container');
 let imagesOnCanvas = new Array();
+let countImagesOnCanvas = 0;
 
 //-------------Изменение стиля доски-------------------------------------------------------
 let btnSwitchStyle = document.querySelector('#btn_switch_color');
@@ -781,12 +782,6 @@ btnClearBoard.addEventListener('click', function() {
 	clearArrayImages();
 	clearArrayPins();
 	clearArrayPalette();
-
-	//Очищение формы и инпута НУЖНО ЛИ?
-	/*input.value = '';
-	let newImgDraggable = document.querySelector('.draggableNewImg');
-	newImgDraggable.remove();
-	newImg.setAttribute('src', '../img/default_picture.svg');*/
 });
 
 function clearArrayImages() {
@@ -835,21 +830,12 @@ let resultModalWindow = document.querySelector('.overlay_with_result');
 let paletteImgContainer = document.querySelector('.palette_img_container');
 
 btnSaveBoard.addEventListener('click', function() {
-	let context = canvas.getContext("2d");
 	canvas.width = 950;
 	canvas.height = 550;
+	canvas.background = stylesForCanvas[currentStyle];
+	let context = canvas.getContext("2d");
+	context.clearRect(0, 0, 950, 550);
 	let coordsC = canvas.getBoundingClientRect();
-
-	//сортировка и массива imagesOnCanvas
-	for (let i = 0; i < imagesOnCanvas.length; i++) {
-		for (let j = i; j < imagesOnCanvas.length; j++) {
-			if (imagesOnCanvas[i].style.zIndex >= imagesOnCanvas[j].style.zIndex) {
-				let temp = imagesOnCanvas[i];
-				imagesOnCanvas[i] = imagesOnCanvas[j];
-				imagesOnCanvas[j] = temp;
-			}
-		}
-	}
 
 	//отрисовка на канвасе фона
 	let backgroundImg = new Image();
@@ -857,14 +843,20 @@ btnSaveBoard.addEventListener('click', function() {
 	let finishURL = stylesForCanvas[currentStyle].indexOf(')');
 	let url = stylesForCanvas[currentStyle].slice(startURL + 2, finishURL - 1);
 	backgroundImg.src = url;
-	backgroundImg.style.width = canvas.style.width;
-	backgroundImg.style.height = canvas.style.height;
+	backgroundImg.width = canvas.width;
+	backgroundImg.height = canvas.height;
 	context.drawImage(backgroundImg, 0, 0);
 
-	//и картинок с учетом смещения координат
-	for (let i = 0; i < imagesOnCanvas.length; i++) {
-		let coordsImg = imagesOnCanvas[i].getBoundingClientRect();
-		context.drawImage(imagesOnCanvas[i], parseInt(imagesOnCanvas[i].style.left) - coordsC.left, parseInt(imagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
+	//и картинок с учетом смещения координат и z-слоев
+	if (boardImagesContainer.hasChildNodes()) {
+		let children = boardImagesContainer.childNodes;
+		let imagesOnCanvas = [];
+		children.forEach(elem => imagesOnCanvas.push(elem));
+		let sortedImagesOnCanvas = mergeSort(imagesOnCanvas);
+		for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
+			let coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
+			context.drawImage(sortedImagesOnCanvas[i], parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left, parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
+		}
 	}
 
 	//палеток
@@ -902,6 +894,38 @@ btnSaveBoard.addEventListener('click', function() {
 	interface.style.display = 'none';
 	resultModalWindow.style.zIndex = 3;
 });
+
+function mergeSort(array) {
+    if (!array || !array.length) {
+        return null;
+    }
+
+    if (array.length <= 1) {
+        return array;
+    }
+
+    const middle = Math.floor(array.length / 2);
+    const arrayLeft = array.slice(0, middle);
+    const arrayRight = array.slice(middle);
+
+    return merge(mergeSort(arrayLeft), mergeSort(arrayRight));;
+};
+
+function merge(arrayPart1, arrayPart2) {
+    let arraySort = [];
+    let i = 0;
+	let j = 0;
+  
+    while (i < arrayPart1.length && j < arrayPart2.length) {
+		if (arrayPart1[i].style.zIndex < arrayPart2[j].style.zIndex) {
+			arraySort.push(arrayPart1[i++]);
+		} else {
+			arraySort.push(arrayPart2[j++]);
+		}
+    }
+
+    return [...arraySort, ...arrayPart1.slice(i), ...arrayPart2.slice(j)];
+};
 //---------------------------------------------------------------------------------------------
 
 
