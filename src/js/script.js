@@ -1,14 +1,16 @@
-let canvas = document.querySelector('#canvas');
-let container = document.querySelector('.container');
+const canvas = document.querySelector('#canvas');
+const context = canvas.getContext("2d");
+const CANVAS_WIDTH = 950;
+const CANVAS_HEIGHT = 550;
+
+const container = document.querySelector('.container');
 let marginStart = container.getBoundingClientRect().left;
 let marginNow = container.getBoundingClientRect().left;
 let marginDx = 0;
 
-let boardImagesContainer = document.querySelector('.board-image_container');
-let countImagesOnCanvas = 0;
-
 //-------------Изменение стиля доски-------------------------------------------------------
 let btnSwitchStyle = document.querySelector('#btn_switch_color');
+
 let stylesForBtn = ['url("../img/btnStyle/cork_style.jpg") center center/cover no-repeat',
 				'url("../img/btnStyle/graphite_style.jpg") center center/cover no-repeat',
 				'url("../img/btnStyle/white_style.jpg") center center/cover no-repeat'];
@@ -23,10 +25,8 @@ btnSwitchStyle.addEventListener('click', function() {
 	btnSwitchStyle.style.background = stylesForBtn[currentStyle];
 	canvas.style.background = stylesForCanvas[currentStyle];
 
-	//замена вида кнопки для пинов и пинов на соответствующие
 	btnPins.style.background = stylesForBtnPin[currentStyle];
 
-	// pinsContainer.childElementCount;
 	if (pinsContainer.hasChildNodes()) {
 		let children = pinsContainer.childNodes;
 		children.forEach(element => styleOfPin(element));
@@ -42,10 +42,12 @@ btnSwitchStyle.addEventListener('click', function() {
 				children[i].style.top = canvasCoord.top;
 			}
 			if (pinCoord.right > canvasCoord.right) {
-				children[i].style.left = parseInt(pinCoord.left) - (parseInt(pinCoord.right) - parseInt(canvasCoord.right)) + 'px';
+				children[i].style.left = parseInt(pinCoord.left) - (parseInt(pinCoord.right) 
+										- parseInt(canvasCoord.right)) + 'px';
 			}
 			if (pinCoord.bottom > canvasCoord.bottom) {
-				children[i].style.top = parseInt(pinCoord.top) - (parseInt(pinCoord.bottom) - parseInt(canvasCoord.bottom)) + 'px';
+				children[i].style.top = parseInt(pinCoord.top) - (parseInt(pinCoord.bottom) 
+										- parseInt(canvasCoord.bottom)) + 'px';
 			}
 		}
 	}
@@ -53,7 +55,7 @@ btnSwitchStyle.addEventListener('click', function() {
 //-----------------------------------------------------------------------------------------
 
 
-//-----Добавление пинов на доску---------
+//-------------------------Добавление пинов на доску---------------------------------------
 let btnPins = document.querySelector('#btn_pins');
 let pinsContainer = document.querySelector('.board-pins_container');
 
@@ -165,12 +167,12 @@ document.addEventListener('mousedown', function(event) {
 		let leftE = dragElement.getBoundingClientRect().left;
 		let rightE = dragElement.getBoundingClientRect().right;
 	
-		if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) { //когда попадаем в канвас
+		if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) {
 		  	dragElement.style.top = parseInt(dragElement.style.top) + pageYOffset + 'px';
 		} else { 
-			if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) { //когда отпускаем изображение полностью за пределами канваса, оно удаляется
+			if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) {
 				dragElement.remove();
-			} else { //когда отпускаем изображение частично  за пределами канваса, оно возвращается на канвас
+			} else {
 				dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
 				dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
 			}
@@ -221,15 +223,15 @@ document.addEventListener('mousedown', function(event) {
 	}
 	
 });
-//--------------------------------------
 
 function randomInt(min, max) {
 	let rand = min - 0.5 + Math.random() * (max - min + 1);
 	return Math.round(rand);
   }
+  //---------------------------------------------------------------------------------------
 
 
-//-----добавление палетки----
+//------------------------------добавление палетки----------------------------------------
 let btnPalette = document.querySelector('#btn_color');
 let paletteContainer = document.querySelector('.palette_container');
 
@@ -366,7 +368,7 @@ document.addEventListener('mousedown', function(event) {
 	}
 	
 });
-//---------------------------
+//-------------------------------------------------------------------------------------------
 
 //для изменения z-индекса
 function zIndexChange(obj, num) {
@@ -418,7 +420,7 @@ form.addEventListener('submit', function(e) {
 				newImgDraggable.style.left = leftNewImgDraggable;
 				newImgDraggable.style.top = topNewImgDraggable;
 
-				newImg.before(newImgDraggable); //Вставляем newImgDraggable перед newImg в HTML
+				newImg.before(newImgDraggable);
           	},
             error => {
 				newImg.setAttribute('src', '../img/picture_404.svg');
@@ -438,7 +440,7 @@ function loadImage(src) {
   
       document.head.append(img);
     });
-  }
+}
 
 //Удобно ли?
 input.addEventListener('dblclick', function() {
@@ -449,6 +451,7 @@ input.addEventListener('dblclick', function() {
 
 
 //------Перетаскивание изображения на канвас----------------------------------------------
+const boardImagesContainer = document.querySelector('.board-image_container');
 let isDragging = false;
 
 document.addEventListener('mousedown', function(event) {
@@ -825,9 +828,7 @@ let paletteImgContainer = document.querySelector('.palette_img_container');
 btnSaveBoard.addEventListener('click', function() {
 	canvas.width = 950;
 	canvas.height = 550;
-	canvas.background = stylesForCanvas[currentStyle];
-	let context = canvas.getContext("2d");
-	context.clearRect(0, 0, 950, 550);
+
 	let coordsC = canvas.getBoundingClientRect();
 
 	//отрисовка на канвасе фона
@@ -838,54 +839,62 @@ btnSaveBoard.addEventListener('click', function() {
 	backgroundImg.src = url;
 	backgroundImg.width = canvas.width;
 	backgroundImg.height = canvas.height;
-	context.drawImage(backgroundImg, 0, 0);
+	let promise = loadImage(url);
 
-	//и картинок с учетом смещения координат и z-слоев
-	if (boardImagesContainer.hasChildNodes()) {
-		let children = boardImagesContainer.childNodes;
-		let imagesOnCanvas = [];
-		children.forEach(elem => imagesOnCanvas.push(elem));
-		let sortedImagesOnCanvas = mergeSort(imagesOnCanvas);
-		for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
-			let coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
-			context.drawImage(sortedImagesOnCanvas[i], parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left, parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
-		}
-	}
+	promise.then(
+		img => {
+			context.drawImage(backgroundImg, 0, 0);
 
-	//палеток
-	if (paletteContainer.hasChildNodes()) {
-		let children = paletteContainer.childNodes;
-		for (let i = 0; i < children.length; i++) {
-			context.beginPath();
-			context.rect(parseInt(children[i].style.left) - coordsC.left, parseInt(children[i].style.top) - coordsC.top, 70.6, 70.6);
-			context.fillStyle = "#eeeeee";
-			context.fill();
+			//и картинок с учетом смещения координат и z-слоев
+			if (boardImagesContainer.hasChildNodes()) {
+				let children = boardImagesContainer.childNodes;
+				let imagesOnCanvas = [];
+				children.forEach(elem => imagesOnCanvas.push(elem));
+				let sortedImagesOnCanvas = mergeSort(imagesOnCanvas);
+				for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
+					let coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
+					context.drawImage(sortedImagesOnCanvas[i], parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left, parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top, parseInt(coordsImg.right - coordsImg.left), parseInt(coordsImg.bottom - coordsImg.top));
+				}
+			}
 
-			context.beginPath();
-			context.rect(parseInt(children[i].style.left) + 5 - coordsC.left, parseInt(children[i].style.top) + 5 - coordsC.top, 60, 60);
-			context.fillStyle = children[i].value;
-			context.fill();
-			context.lineWidth = 0.3;
-			context.stroke();
-		}
-	}
+			//палеток
+			if (paletteContainer.hasChildNodes()) {
+				let children = paletteContainer.childNodes;
+				for (let i = 0; i < children.length; i++) {
+					context.beginPath();
+					context.rect(parseInt(children[i].style.left) - coordsC.left, parseInt(children[i].style.top) - coordsC.top, 70.6, 70.6);
+					context.fillStyle = "#eeeeee";
+					context.fill();
 
-	//и пинов с учетом смещения координат
-	// pinsContainer.childElementCount;
-	if (pinsContainer.hasChildNodes()) {
-		let children = pinsContainer.childNodes;
-		children.forEach(element => context.drawImage(element, parseInt(element.style.left) - coordsC.left, parseInt(element.style.top) - coordsC.top, parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top)));
-	}
+					context.beginPath();
+					context.rect(parseInt(children[i].style.left) + 5 - coordsC.left, parseInt(children[i].style.top) + 5 - coordsC.top, 60, 60);
+					context.fillStyle = children[i].value;
+					context.fill();
+					context.lineWidth = 0.3;
+					context.stroke();
+				}
+			}
 
-	//display none у всех элементов на канвасе
-	boardImages.style.display = 'none';
-	pinsContainer.style.display = 'none';
-	paletteContainer.style.display = 'none';
+			//и пинов с учетом смещения координат
+			// pinsContainer.childElementCount;
+			if (pinsContainer.hasChildNodes()) {
+				let children = pinsContainer.childNodes;
+				children.forEach(element => context.drawImage(element, parseInt(element.style.left) - coordsC.left, parseInt(element.style.top) - coordsC.top, parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top)));
+			}
 
-	//всплытие оверлея с подсказкой как сохранить картинку
-	resultModalWindow.style.display = 'flex';
-	interface.style.display = 'none';
-	resultModalWindow.style.zIndex = 3;
+			//display none у всех элементов на канвасе
+			boardImages.style.display = 'none';
+			pinsContainer.style.display = 'none';
+			paletteContainer.style.display = 'none';
+
+			//всплытие оверлея с подсказкой как сохранить картинку
+			resultModalWindow.style.display = 'flex';
+			interface.style.display = 'none';
+			resultModalWindow.style.zIndex = 3;
+
+		},
+		error => {}
+	)
 });
 
 function mergeSort(array) {
