@@ -5,7 +5,6 @@ let marginNow = container.getBoundingClientRect().left;
 let marginDx = 0;
 
 let boardImagesContainer = document.querySelector('.board-image_container');
-let imagesOnCanvas = new Array();
 let countImagesOnCanvas = 0;
 
 //-------------Изменение стиля доски-------------------------------------------------------
@@ -371,7 +370,7 @@ document.addEventListener('mousedown', function(event) {
 
 //для изменения z-индекса
 function zIndexChange(obj, num) {
-	obj.style.zIndex = imagesOnCanvas.length + num;
+	obj.style.zIndex = boardImagesContainer.childElementCount + num;
 }
 
 //-------------Взятие изображения по url---------------------------------------------------
@@ -489,12 +488,10 @@ document.addEventListener('mousedown', function(event) {
 
 	newImgDraggable.style.top = topNewImgDraggable;
 	newImgDraggable.style.left = leftNewImgDraggable;
-	//кладем изображение в массив изображений на канвасе
-	imagesOnCanvas.push(dragElementCopy);
 
 	try {
 		newImgDraggable = document.querySelector('.draggableNewImg');
-		zIndexChange(newImgDraggable, 3);
+		zIndexChange(newImgDraggable, 1);
 	} catch {
 
 	}
@@ -634,7 +631,7 @@ document.addEventListener('mousedown', function(event) {
 	}
 
 	zIndex = dragElement.style.zIndex;
-	zIndexChange(dragElement, 2);
+	zIndexChange(dragElement, 1);
 
 	takeNewImg = false;
 
@@ -652,13 +649,10 @@ document.addEventListener('mousedown', function(event) {
 
 		try {
 			newImgDraggable = document.querySelector('.draggableNewImg');
-			zIndexChange(newImgDraggable, 3);
+			zIndexChange(newImgDraggable, 1);
 		} catch {
 	
 		}
-
-		zIndexChange(dragElement, 1);
-
 	};
 	
 	function onMouseMove(event) {
@@ -718,15 +712,14 @@ document.addEventListener('mousedown', function(event) {
 		document.removeEventListener('mousemove', onMouseMove);
 		dragElement.removeEventListener('mouseup', onMouseUp);
 
-		if (previousDraggingOnCanvas && previousDraggingOnCanvas != dragElement) {
-		 	imagesOnCanvas.forEach((item) => {
-		 		if (item.style.zIndex > 0 && item.style.zIndex > zIndex) {
-		 			item.style.zIndex = item.style.zIndex - 1;
-		 		}
-					
-		 	});
+		if (boardImagesContainer.hasChildNodes()) {
+			let children = boardImagesContainer.childNodes;
+			children.forEach( function(elem) {
+				if (elem.style.zIndex > zIndex) {
+					elem.style.zIndex = elem.style.zIndex - 1;
+				}
+			});
 		}
-
 
 		previousDraggingOnCanvas = dragElement;
 		deleteZone.style.backgroundColor = 'rgba(255, 180, 180, 0)';
