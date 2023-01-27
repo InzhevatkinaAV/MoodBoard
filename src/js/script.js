@@ -292,10 +292,10 @@ btnSaveBoard.addEventListener('click', function() {
 				for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
 					let coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
 					context.drawImage(sortedImagesOnCanvas[i], 
-										parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left, 
-										parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top, 
-										parseInt(coordsImg.right - coordsImg.left), 
-										parseInt(coordsImg.bottom - coordsImg.top));
+									parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left, 
+									parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top, 
+									parseInt(coordsImg.right - coordsImg.left), 
+									parseInt(coordsImg.bottom - coordsImg.top));
 				}
 			}
 
@@ -305,15 +305,15 @@ btnSaveBoard.addEventListener('click', function() {
 				for (let i = 0; i < children.length; i++) {
 					context.beginPath();
 					context.rect(parseInt(children[i].style.left) - coordsC.left, 
-									parseInt(children[i].style.top) - coordsC.top, 
-									70.6, 70.6);
+								parseInt(children[i].style.top) - coordsC.top, 
+								70.6, 70.6);
 					context.fillStyle = "#eeeeee";
 					context.fill();
 
 					context.beginPath();
 					context.rect(parseInt(children[i].style.left) + 5 - coordsC.left, 
-											parseInt(children[i].style.top) + 5 - coordsC.top, 
-											60, 60);
+										parseInt(children[i].style.top) + 5 - coordsC.top, 
+										60, 60);
 					context.fillStyle = children[i].value;
 					context.fill();
 					context.lineWidth = 0.3;
@@ -325,10 +325,11 @@ btnSaveBoard.addEventListener('click', function() {
 			if (pinsContainer.hasChildNodes()) {
 				let children = pinsContainer.childNodes;
 				children.forEach(element => {context.drawImage(element, 
-																parseInt(element.style.left) - coordsC.left, 
-																parseInt(element.style.top) - coordsC.top, 
-																parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), 
-																parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top))});
+											parseInt(element.style.left) - coordsC.left, 
+											parseInt(element.style.top) - coordsC.top, 
+											parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), 
+											parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top))
+										});
 			}
 
 			boardImagesContainer.style.display = 'none';
