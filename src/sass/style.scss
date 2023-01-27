@@ -106,11 +106,16 @@ header {
                     width: 100%;
                     #new_image-url {
                         width: 100%;
-                        padding: 2%;
+                        padding: 8px;
+                        border: none;
+                        border: 1px solid rgb(174, 174, 174);
                         &:focus {
                             outline: none;
+                            border: 1px solid black;
                         }
-
+                    }
+                    input::placeholder {
+                        color: #c7c5c5;
                     }
                 }
                 #new_image__wrapper {
@@ -151,7 +156,6 @@ header {
                         box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.25);
                         padding: 0;
                         filter: contrast(100%);
-                        font-size: 30px;
                     }
                 }
                 #btn_switch_color {     
@@ -162,6 +166,10 @@ header {
                 }
                 #btn_color {
                     background: url("../img/btnStyle/palette.jpg") center center/cover no-repeat;
+                    &:hover {
+                        box-shadow: 4px 4px 8px rgba(88, 88, 88, 0.25);
+                        filter: contrast(95%);
+                    }
                 }
             }
 
@@ -223,6 +231,14 @@ footer {
         a {
             margin: 0;
             margin-right: 15px;
+            &:hover {
+                svg {
+                    path {
+                        transition: 1s all;
+                        fill: grey;
+                    }
+                }
+            }
         }
         span {
             margin: 0;
