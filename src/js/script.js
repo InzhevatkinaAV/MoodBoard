@@ -56,6 +56,7 @@ form.addEventListener('submit', function(e) {
             	newImg.setAttribute('src', input.value);
 				
 				newImgDraggable.setAttribute('src', input.value);
+				newImgDraggable.classList.add('draggableNewImg');
 				newImgDraggable.style.maxHeight = '220px';
 				newImgDraggable.style.maxWidth = '330px'
 				newImgDraggable.style.objectFit = 'contain';
@@ -65,8 +66,6 @@ form.addEventListener('submit', function(e) {
 				topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
 				newImgDraggable.style.left = leftNewImgDraggable;
 				newImgDraggable.style.top = topNewImgDraggable;
-
-				newImgDraggable.classList.add('draggableNewImg');
 
 				newImg.before(newImgDraggable);
           	},
@@ -182,7 +181,6 @@ btnSwitchStyle.addEventListener('click', function() {
 	}
 
 	function changePinsStyle() {
-		console.log("!");
 		if (pinsContainer.hasChildNodes()) {
 			let children = pinsContainer.childNodes;
 			children.forEach(element => styleOfPin(element));
@@ -325,11 +323,11 @@ btnSaveBoard.addEventListener('click', function() {
 			if (pinsContainer.hasChildNodes()) {
 				let children = pinsContainer.childNodes;
 				children.forEach(element => {context.drawImage(element, 
-											parseInt(element.style.left) - coordsC.left, 
-											parseInt(element.style.top) - coordsC.top, 
-											parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), 
-											parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top))
-										});
+									parseInt(element.style.left) - coordsC.left, 
+									parseInt(element.style.top) - coordsC.top, 
+									parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), 
+									parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top))
+							});
 			}
 
 			boardImagesContainer.style.display = 'none';
