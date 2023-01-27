@@ -11,7 +11,7 @@ html {
 }
 
 .container {
-    width: 1440px;
+    width: 1360px;
     margin: 0 auto;
 }
 
@@ -70,7 +70,7 @@ header {
                 object-fit: contain;
                 position: absolute;
             }
-            .palette_container {
+            .board-palette_container {
                 z-index: 999;
                 .palette {
                     z-index: 999;
@@ -89,10 +89,10 @@ header {
             justify-content: space-between;
             align-items: center;
             flex-direction: column;
-            width: 25%;
+            width: 360px;
             height: 550px;
             .get_new_image__wrapper {
-                padding: 4%;
+                padding: 14px;
                 width: 100%;
                 height: 300px;
                 display: flex;
