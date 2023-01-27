@@ -1,5 +1,6 @@
 @import 'libs/bootstrap-reboot.min';
 @import 'libs/fonts';
+@import 'variables';
 
 * {
     font-family: 'Ubuntu', sans-serif;
@@ -11,7 +12,7 @@ html {
 }
 
 .container {
-    width: 1360px;
+    width: $container-width;
     margin: 0 auto;
 }
 
@@ -27,7 +28,7 @@ html {
 
 header {
     background: linear-gradient(180deg, #EDEDED 0%, rgba(121, 121, 121, 0) 80%);
-    min-width: 1360px;
+    min-width: $container-width;
     height: 70px;
     .menu__wrapper {
         height: 70px;
@@ -51,18 +52,18 @@ header {
         align-items: center;
         .board__wrapper {
             z-index: 0;
-            width: 950px;
-            height: 550px;
+            width: $board-width;
+            height: $board-height;
             #canvas {
                 transition: 0.5s all;
-                width: 950px;
-                height: 550px;
+                width: $board-width;
+                height: $board-height;
                 background-color: #fff;
                 background: url("../img/board/white_board.jpg") center center/cover no-repeat;
             }
             .draggableNewImg {
-                max-height: 220px;
-                max-width: 330px;
+                max-width: $max-image-width;
+                max-height: $max-image-height;
                 object-fit: contain;
                 position: absolute;
             }
@@ -90,12 +91,12 @@ header {
             justify-content: space-between;
             align-items: center;
             flex-direction: column;
-            width: 360px;
-            height: 550px;
+            width: $interface-width;
+            height: $board-height;
             .get_new_image__wrapper {
-                padding: 14px;
+                padding: 4%;
                 width: 100%;
-                height: 300px;
+                height: $get-img-form-height;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
@@ -116,13 +117,13 @@ header {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    width: 330px;
-                    height: 220px;
+                    width: $max-image-width;
+                    height: $max-image-height;
                     background-color:#f0f0f0;
                     #new_image {
                         object-fit: contain;
                         max-width: 100%;
-                        max-height: 220px;
+                        max-height: $max-image-height;
                         z-index: 0;
                     }
                     .draggableNewImg {
@@ -140,8 +141,8 @@ header {
                     border: none;
                     transition: 0.5s all;
                     filter: contrast(90%);
-                    width: 115px;
-                    height: 115px;
+                    width: $btn-decoration-size;
+                    height: $btn-decoration-size;
                     &:focus {
                         outline: none;
                     }
@@ -171,8 +172,8 @@ header {
                 align-items: center;
                 #btn_clean {
                     border: none;
-                    height: 50px;
-                    width: 70px;
+                    height: $btn-result-height;
+                    width: $btn-clean-width;
                     background-color: rgb(255, 180, 180);
                     padding: 0;
                     transition: 0.5s all;
@@ -189,8 +190,8 @@ header {
                 }
                 #btn_save {
                     border: none;
-                    height: 50px;
-                    width: 270px;
+                    height: $btn-result-height;
+                    width: $btn-save-width;
                     background-color: rgb(180, 255, 199);
                     transition: 0.5s all;
                     &:hover {
@@ -213,7 +214,7 @@ header {
 footer {
     background:  linear-gradient(180deg, rgba(121, 121, 121, 0) 12.81%, #EDEDED 100%);
     height: 30px;
-    min-width: 1360px;
+    min-width: $container-width;
     .footer__wrapper {
         width: 100%;
         display: flex;
@@ -236,15 +237,15 @@ footer {
     align-items: center;
     flex-direction: column;
     z-index: 2;
-    height: 550px;
-	width: 360px;
+    height: $board-height;
+	width: $interface-width;
     #continue {
         border: none;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 50px;
-        width: 360px;
+        height: $btn-result-height;
+        width: $interface-width;
         background-color: rgb(255, 249, 180);
         font-size: 16px;
         transition: 0.5s all;

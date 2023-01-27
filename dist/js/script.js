@@ -1,7 +1,9 @@
 const canvas = document.querySelector('#canvas');
 const context = canvas.getContext("2d");
-const CANVAS_WIDTH = 950;
+const CANVAS_WIDTH = 850;
 const CANVAS_HEIGHT = 550;
+const MAX_IMG_WIDTH = '276px';
+const MAX_IMG_HEIGHT = '255px';
 
 const container = document.querySelector('.container');
 const boardImagesContainer = document.querySelector('.board-image_container');
@@ -57,8 +59,8 @@ form.addEventListener('submit', function(e) {
 				
 				newImgDraggable.setAttribute('src', input.value);
 				newImgDraggable.classList.add('draggableNewImg');
-				newImgDraggable.style.maxHeight = '220px';
-				newImgDraggable.style.maxWidth = '330px'
+				newImgDraggable.style.maxHeight = MAX_IMG_HEIGHT;
+				newImgDraggable.style.maxWidth = MAX_IMG_WIDTH;
 				newImgDraggable.style.objectFit = 'contain';
 				newImgDraggable.style.position = 'absolute';
 				newImgDraggable.style.zIndex = 1;
@@ -493,8 +495,8 @@ document.addEventListener('mousedown', function(event) {
         if (typeOfDragElement == "draggableNewImg") {
             let dragElementCopy = document.createElement('img');
             dragElementCopy.setAttribute('src', dragElement.src);
-            dragElementCopy.style.maxHeight = '220px';
-            dragElementCopy.style.maxWidth = '330px'
+            dragElementCopy.style.maxHeight = MAX_IMG_HEIGHT;
+            dragElementCopy.style.maxWidth = MAX_IMG_WIDTH;
             dragElementCopy.style.objectFit = 'contain';
             dragElementCopy.style.position = 'absolute';
 
