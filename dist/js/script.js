@@ -479,14 +479,17 @@ document.addEventListener('mousedown', function(event) {
         }
 	}
 
-    shiftDraggableLayer();
-
 	event.preventDefault();
 	dragElement.ondragstart = function() {
     	return false;
 	};
 
+	shiftDraggableLayer();
+	hiddenInterface();
+
 	let shiftX, shiftY;
+	let topC, bottomC, leftC, rightC;
+	let topE, bottomE, leftE, rightE;
 
   	startDrag(dragElement, event.clientX, event.clientY);
 
@@ -515,6 +518,17 @@ document.addEventListener('mousedown', function(event) {
 
 	function onMouseMove(event) {
 		moveAt(event.clientX, event.clientY);
+
+		getCanvasAndElementCoordinats()
+		if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) {
+			if (typeOfDragElement != "draggableNewImg") {
+				showDeleteZone();
+			}
+		} else {
+			if (typeOfDragElement != "draggableNewImg") {
+				hiddenDeleteZone();
+			}
+		}
 	}
 
 	function startDrag(element, clientX, clientY) {
@@ -523,8 +537,6 @@ document.addEventListener('mousedown', function(event) {
 		}
 	
 		isDragging = true;
-
-		showDeleteZone();
 	
 		document.addEventListener('mousemove', onMouseMove);
 		element.addEventListener('mouseup', onMouseUp);
@@ -544,30 +556,21 @@ document.addEventListener('mousedown', function(event) {
 	
 		isDragging = false;
 
-        let topC = canvas.getBoundingClientRect().top;
-		let bottomC = canvas.getBoundingClientRect().bottom;
-		let leftC = canvas.getBoundingClientRect().left;
-		let rightC = canvas.getBoundingClientRect().right;
-	
-		let topE = dragElement.getBoundingClientRect().top;
-		let bottomE = dragElement.getBoundingClientRect().bottom;
-		let leftE = dragElement.getBoundingClientRect().left;
-		let rightE = dragElement.getBoundingClientRect().right;
-	
+        getCanvasAndElementCoordinats();
 		if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) {
 		  	dragElement.style.top = parseInt(dragElement.style.top) + 'px';
 		} else { 
 			if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) {
                 if (typeOfDragElement != "draggableNewImg") {
                     dragElement.remove();
+					hiddenDeleteZone();
                 } else {
 					if (typeOfDragElement == "pin" || typeOfDragElement == "palette") {
 						dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
 						dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
 					} else {
-						
 						dragElement.style.left = leftC + 15 + 'px';
-						   dragElement.style.top = topC + 15 + 'px';
+						dragElement.style.top = topC + 15 + 'px';
 					}
                 }
 			} else {
@@ -585,7 +588,7 @@ document.addEventListener('mousedown', function(event) {
 		document.removeEventListener('mousemove', onMouseMove);
 		dragElement.removeEventListener('mouseup', onMouseUp);
 
-        hiddenDeleteZone();
+        showInterface();
 
 		shiftAllLayers();
 	}
@@ -654,16 +657,37 @@ document.addEventListener('mousedown', function(event) {
 	function showDeleteZone() {
 		if (typeOfDragElement != "draggableNewImg") {
 		    deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_V;
-		    interface.style.zIndex = '-2';
         }
 	}
 
 	function hiddenDeleteZone() {
 		if (typeOfDragElement != "draggableNewImg") {
             deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_H;
+        }
+	}
+
+	function showInterface() {
+		if (typeOfDragElement != "draggableNewImg") {
 		    interface.style.zIndex = '0';
         }
 	}
+
+	function hiddenInterface() {
+		if (typeOfDragElement != "draggableNewImg") {
+		    interface.style.zIndex = '-2';
+        }
+	}
+
+	function getCanvasAndElementCoordinats() {
+		topC = canvas.getBoundingClientRect().top;
+		bottomC = canvas.getBoundingClientRect().bottom;
+		leftC = canvas.getBoundingClientRect().left;
+		rightC = canvas.getBoundingClientRect().right;
 	
+		topE = dragElement.getBoundingClientRect().top;
+		bottomE = dragElement.getBoundingClientRect().bottom;
+		leftE = dragElement.getBoundingClientRect().left;
+		rightE = dragElement.getBoundingClientRect().right;
+	}
 });
 //----------------------------------------------------------------------------------------
