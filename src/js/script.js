@@ -20,13 +20,13 @@ let newImgDraggable, leftNewImgDraggable, topNewImgDraggable;
 
 function loadImage(src) {
 	return new Promise(function(resolve, reject) {
-	  let img = document.createElement('img');
-	  img.src = src;
-  
-	  img.onload = () => resolve(img);
-	  img.onerror = () => reject(new Error(`Ошибка загрузки изображения ${src}`));
-  
-	  document.head.append(img);
+		const img = document.createElement('img');
+		img.src = src;
+		
+		img.onload = () => resolve(img);
+		img.onerror = () => reject(new Error(`Ошибка загрузки изображения ${src}`));
+		
+		document.head.append(img);
 	});
 }
 
@@ -45,9 +45,9 @@ form.addEventListener('submit', function(e) {
 	e.preventDefault();
 
 	try {
-		let previous = document.querySelector('.draggableNewImg');
+		const previous = document.querySelector('.draggableNewImg');
 		newImgWrapper.removeChild(previous);
-		} catch {}
+	} catch {}
 
 	newImgDraggable = document.createElement('img');
 
@@ -71,7 +71,7 @@ form.addEventListener('submit', function(e) {
 				getNewDraggableImgCoordinats();
 
 				newImg.before(newImgDraggable);
-		  	},
+				},
 			error => {
 				newImg.setAttribute('src', '../img/picture_img_not_found.svg');
 				newImgDraggable.remove();
@@ -87,19 +87,19 @@ form.addEventListener('submit', function(e) {
 const btnPins = document.querySelector('#btn_pins');
 
 const stylesForBtnPin = ['url("../img/btnStyle/white_style_pin.jpg") center center/cover no-repeat',
-				'url("../img/btnStyle/cork_style_pin.jpg") center center/cover no-repeat',
-				'url("../img/btnStyle/graphite_style_pin.jpg") center center/cover no-repeat'];
+		'url("../img/btnStyle/cork_style_pin.jpg") center center/cover no-repeat',
+		'url("../img/btnStyle/graphite_style_pin.jpg") center center/cover no-repeat'];
 
 const pinWhiteBoard = "../img/pins/pin1_style3.png";
 const pinCorkBoard = ["../img/pins/pin1_style1.png", "../img/pins/pin2_style1.png", 
-				"../img/pins/pin3_style1.png", "../img/pins/pin4_style1.png",
-				"../img/pins/pin5_style1.png"];
+		"../img/pins/pin3_style1.png", "../img/pins/pin4_style1.png",
+		"../img/pins/pin5_style1.png"];
 const pinGraphiteBoard = ["../img/pins/pin1_style2.png", "../img/pins/pin2_style2.png", 
-				"../img/pins/pin3_style2.png", "../img/pins/pin4_style2.png",
-				"../img/pins/pin5_style2.png"];
+		"../img/pins/pin3_style2.png", "../img/pins/pin4_style2.png",
+		"../img/pins/pin5_style2.png"];
 
 btnPins.addEventListener('click', function() {
-	let newPin = document.createElement('img');
+	const newPin = document.createElement('img');
 	
 	styleOfPin(newPin);
 
@@ -118,7 +118,7 @@ btnPins.addEventListener('click', function() {
 const btnPalette = document.querySelector('#btn_color');
 
 btnPalette.addEventListener('click', function(event) {
-	let newPalette = document.createElement('input');
+	const newPalette = document.createElement('input');
 	newPalette.type = "color";
 	newPalette.name="bg";
 	
@@ -137,11 +137,11 @@ btnPalette.addEventListener('click', function(event) {
 const btnSwitchStyle = document.querySelector('#btn_switch_color');
 
 const stylesForBtn = ['url("../img/btnStyle/cork_style.jpg") center center/cover no-repeat',
-				'url("../img/btnStyle/graphite_style.jpg") center center/cover no-repeat',
-				'url("../img/btnStyle/white_style.jpg") center center/cover no-repeat'];
+		'url("../img/btnStyle/graphite_style.jpg") center center/cover no-repeat',
+		'url("../img/btnStyle/white_style.jpg") center center/cover no-repeat'];
 const stylesForCanvas = ['url("../img/board/white_board.jpg") center center/cover no-repeat',
-				'url("../img/board/cork_board.jpg") center center/cover no-repeat',
-				'url("../img/board/graphite_board.jpg") center center/cover no-repeat'];
+		'url("../img/board/cork_board.jpg") center center/cover no-repeat',
+		'url("../img/board/graphite_board.jpg") center center/cover no-repeat'];
 let currentStyle = 0;
 
 function styleOfPin(pin) {
@@ -163,9 +163,9 @@ function styleOfPin(pin) {
 }
 
 function randomInt(min, max) {
-	let rand = min - 0.5 + Math.random() * (max - min + 1);
+	const rand = min - 0.5 + Math.random() * (max - min + 1);
 	return Math.round(rand);
-  }
+}
 
 btnSwitchStyle.addEventListener('click', function() {
 	currentStyle = ++currentStyle % 3;
@@ -182,31 +182,33 @@ btnSwitchStyle.addEventListener('click', function() {
 
 	function changePinsStyle() {
 		if (pinsContainer.hasChildNodes()) {
-			let children = pinsContainer.childNodes;
+			const children = pinsContainer.childNodes;
 			children.forEach(element => styleOfPin(element));
 	
-			let canvasCoord = canvas.getBoundingClientRect();
+			const canvasCoord = canvas.getBoundingClientRect();
+			let {top: canvasCoordTop, right: canvasCoordRight, bottom: canvasCoordBottom, left: canvasCoordLeft} = canvasCoord;
 	
 			for (let i = 0; i < children.length; i++) {
-				let pinCoord = children[i].getBoundingClientRect();
-				if (pinCoord.left < canvasCoord.left) {
-					children[i].style.left = canvasCoord.left + window.pageXOffset;
+				const pinCoord = children[i].getBoundingClientRect();
+				let {top: pinCoordTop, right: pinCoordRight, bottom: pinCoordBottom, left: pinCoordLeft} = pinCoord;
+
+				if (pinCoordTop < canvasCoordTop) {
+					children[i].style.top = canvasCoordTop + window.pageYOffset;
 				}
-				if (pinCoord.top < canvasCoord.top) {
-					children[i].style.top = canvasCoord.top + window.pageYOffset;
+				if (pinCoordRight > canvasCoordRight) {
+					children[i].style.left = parseInt(pinCoordLeft) - (parseInt(pinCoordRight) 
+											- parseInt(canvasCoordRight + window.pageXOffset)) + 'px';
 				}
-				if (pinCoord.right > canvasCoord.right) {
-					children[i].style.left = parseInt(pinCoord.left) - (parseInt(pinCoord.right) 
-											- parseInt(canvasCoord.right + window.pageXOffset)) + 'px';
+				if (pinCoordBottom > canvasCoordBottom) {
+					children[i].style.top = parseInt(pinCoordTop) - (parseInt(pinCoordBottom) 
+											- parseInt(canvasCoordBottom + window.pageYOffset)) + 'px';
 				}
-				if (pinCoord.bottom > canvasCoord.bottom) {
-					children[i].style.top = parseInt(pinCoord.top) - (parseInt(pinCoord.bottom) 
-											- parseInt(canvasCoord.bottom + window.pageYOffset)) + 'px';
+				if (pinCoordLeft < canvasCoordLeft) {
+					children[i].style.left = canvasCoordLeft + window.pageXOffset;
 				}
 			}
 		}
 	}
-
 });
 //-------------------------------------------------------------------------------------------
 
@@ -222,7 +224,7 @@ btnClearBoard.addEventListener('click', function() {
 
 	function clearImagesContainer() {
 		if (boardImagesContainer.hasChildNodes()) {
-			let children = boardImagesContainer.childNodes;
+			const children = boardImagesContainer.childNodes;
 			while (children.length > 0) {
 				children[0].remove();
 			}
@@ -231,7 +233,7 @@ btnClearBoard.addEventListener('click', function() {
 	
 	function clearPinsContainer() {
 		if (pinsContainer.hasChildNodes()) {
-			let children = pinsContainer.childNodes;
+			const children = pinsContainer.childNodes;
 			while (children.length > 0) {
 				children[0].remove();
 			}
@@ -240,7 +242,7 @@ btnClearBoard.addEventListener('click', function() {
 	
 	function clearPaletteContainer() {
 		if (paletteContainer.hasChildNodes()) {
-			let children = paletteContainer.childNodes;
+			const children = paletteContainer.childNodes;
 			while (children.length > 0) {
 				children[0].remove();
 			}
@@ -260,18 +262,18 @@ btnSaveBoard.addEventListener('click', function() {
 	canvas.width = CANVAS_WIDTH;
 	canvas.height = CANVAS_HEIGHT;
 
-	let coordsC = canvas.getBoundingClientRect();
+	const coordsC = canvas.getBoundingClientRect();
 
 	//Отрисовка фона
-	let backgroundImg = new Image();
-	let startURL = stylesForCanvas[currentStyle].indexOf('(');
-	let finishURL = stylesForCanvas[currentStyle].indexOf(')');
-	let url = stylesForCanvas[currentStyle].slice(startURL + 2, finishURL - 1);
+	const backgroundImg = new Image();
+	const startURL = stylesForCanvas[currentStyle].indexOf('(');
+	const finishURL = stylesForCanvas[currentStyle].indexOf(')');
+	const url = stylesForCanvas[currentStyle].slice(startURL + 2, finishURL - 1);
 	backgroundImg.src = url;
 	backgroundImg.width = canvas.width;
 	backgroundImg.height = canvas.height;
 
-	let promise = loadImage(url);
+	const promise = loadImage(url);
 
 	promise.then(
 		img => {
@@ -279,12 +281,12 @@ btnSaveBoard.addEventListener('click', function() {
 
 			//Отрисовка картинок с учетом слоев
 			if (boardImagesContainer.hasChildNodes()) {
-				let children = boardImagesContainer.childNodes;
+				const children = boardImagesContainer.childNodes;
 				let imagesOnCanvas = [];
 				children.forEach(elem => imagesOnCanvas.push(elem));
-				let sortedImagesOnCanvas = mergeSort(imagesOnCanvas);
+				const sortedImagesOnCanvas = mergeSort(imagesOnCanvas);
 				for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
-					let coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
+					const coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
 					context.drawImage(sortedImagesOnCanvas[i], 
 						parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left - window.pageXOffset, 
 						parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top - window.pageYOffset, 
@@ -295,19 +297,17 @@ btnSaveBoard.addEventListener('click', function() {
 
 			//Отрисовка палеток
 			if (paletteContainer.hasChildNodes()) {
-				let children = paletteContainer.childNodes;
+				const children = paletteContainer.childNodes;
 				for (let i = 0; i < children.length; i++) {
 					context.beginPath();
 					context.rect(parseInt(children[i].style.left) - coordsC.left - window.pageXOffset, 
-						parseInt(children[i].style.top) - coordsC.top - window.pageYOffset, 
-						70.6, 70.6);
+						parseInt(children[i].style.top) - coordsC.top - window.pageYOffset, 70.6, 70.6);
 					context.fillStyle = "#eeeeee";
 					context.fill();
 
 					context.beginPath();
 					context.rect(parseInt(children[i].style.left) + 5 - coordsC.left - window.pageXOffset, 
-						parseInt(children[i].style.top) + 5 - coordsC.top - window.pageYOffset, 
-						60, 60);
+						parseInt(children[i].style.top) + 5 - coordsC.top - window.pageYOffset, 60, 60);
 					context.fillStyle = children[i].value;
 					context.fill();
 					context.lineWidth = 0.3;
@@ -317,7 +317,7 @@ btnSaveBoard.addEventListener('click', function() {
 
 			//Отрисовка пинов
 			if (pinsContainer.hasChildNodes()) {
-				let children = pinsContainer.childNodes;
+				const children = pinsContainer.childNodes;
 				children.forEach(element => {context.drawImage(element, 
 					parseInt(element.style.left) - coordsC.left - window.pageXOffset, 
 					parseInt(element.style.top) - coordsC.top - window.pageYOffset, 
@@ -351,14 +351,14 @@ btnSaveBoard.addEventListener('click', function() {
 		const arrayLeft = array.slice(0, middle);
 		const arrayRight = array.slice(middle);
 	
-		return merge(mergeSort(arrayLeft), mergeSort(arrayRight));;
+		return merge(mergeSort(arrayLeft), mergeSort(arrayRight));
 	};
 	
 	function merge(arrayPart1, arrayPart2) {
 		let arraySort = [];
 		let i = 0;
 		let j = 0;
-	  
+		
 		while (i < arrayPart1.length && j < arrayPart2.length) {
 			if (arrayPart1[i].style.zIndex < arrayPart2[j].style.zIndex) {
 				arraySort.push(arrayPart1[i++]);
@@ -421,7 +421,7 @@ window.addEventListener('resize', (e) => {
 	if (paletteContainer.hasChildNodes()) {
 		let children = paletteContainer.childNodes;
 		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) +  'px');
-	  }
+		}
 
 	//Передвигаем пины
 	pinsContainer.childElementCount;
@@ -442,22 +442,10 @@ const COLOR_DELETE_ZONE_H = 'rgba(255, 180, 180, 0)';
 let isDragging = false;
 
 document.addEventListener('mousedown', function(event) {
-	let dragElement = event.target.closest('.pin');
-	let typeOfDragElement = "pin";
-	if (!dragElement) {
-		dragElement = event.target.closest('.palette');
-		typeOfDragElement = "palette";
-		if (!dragElement) {
-			dragElement = event.target.closest('.draggableNewImg');
-			typeOfDragElement = "draggableNewImg";
-			if (!dragElement) {
-				dragElement = event.target.closest('.onboardImg');
-				typeOfDragElement = "onboardImg";
-				if (!dragElement) {
-					return;
-				}
-			}
-		}
+	let dragElement, typeOfDragElement;
+	if (!(isTypeOfDragElement("pin") || isTypeOfDragElement("palette") || 
+	isTypeOfDragElement("draggableNewImg") || isTypeOfDragElement("onboardImg"))) {
+		return;
 	}
 
 	event.preventDefault();
@@ -470,12 +458,12 @@ document.addEventListener('mousedown', function(event) {
 	let topC, bottomC, leftC, rightC;
 	let topE, bottomE, leftE, rightE;
 
-  	startDrag(dragElement, event.clientX, event.clientY);
+		startDrag(dragElement, event.clientX, event.clientY);
 
 	function onMouseUp(event) {
 		finishDrag();
 		if (typeOfDragElement == "draggableNewImg") {
-			let dragElementCopy = document.createElement('img');
+			const dragElementCopy = document.createElement('img');
 			dragElementCopy.classList.add('onboardImg');
 
 			dragElementCopy.setAttribute('src', dragElement.src);
@@ -511,7 +499,7 @@ document.addEventListener('mousedown', function(event) {
 
 	function startDrag(element, clientX, clientY) {
 		if(isDragging) {
-		  return;
+			return;
 		}
 	
 		isDragging = true;
@@ -529,7 +517,7 @@ document.addEventListener('mousedown', function(event) {
 
 	function finishDrag() {   
 		if(!isDragging) {
-		  return;
+			return;
 		}
 	
 		isDragging = false;
@@ -558,9 +546,8 @@ document.addEventListener('mousedown', function(event) {
 					dragElement.style.top = topC + (bottomC - topC) / 2 + scrollY + 'px';
 				} else {
 					dragElement.style.left = leftC + 15 + scrollX + 'px';
-		   			dragElement.style.top = topC + 15 + scrollY + 'px';
-				}
-				
+			 		dragElement.style.top = topC + 15 + scrollY + 'px';
+				}	
 			}
 		}
 	
@@ -570,6 +557,18 @@ document.addEventListener('mousedown', function(event) {
 		showInterface();
 
 		shiftAllLayers();
+	}
+
+	function isTypeOfDragElement(type) {
+		typeOfDragElement = type;	
+		type = "." + type;
+		dragElement = event.target.closest(type);
+	
+		 if (!dragElement) {
+			return false;
+		 }
+	
+		 return true;
 	}
 
 	function zIndexChange(obj, num) {
@@ -615,17 +614,17 @@ document.addEventListener('mousedown', function(event) {
 		}
 	
 		if (newY < 0) {
-			  let scrollY = Math.min(-newY, 10);
-			  if (scrollY < 0) scrollY = 0;
+				let scrollY = Math.min(-newY, 10);
+				if (scrollY < 0) scrollY = 0;
 	
-			  window.scrollBy(0, -scrollY);
-			  newY = Math.max(newY, 0);
+				window.scrollBy(0, -scrollY);
+				newY = Math.max(newY, 0);
 		}
 	
 	
 		if (newX < 0) newX = 0;
 		if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
-			  newX = document.documentElement.clientWidth - dragElement.offsetWidth;
+				newX = document.documentElement.clientWidth - dragElement.offsetWidth;
 		}
 	
 		dragElement.style.left = newX + window.pageXOffset + 'px';
