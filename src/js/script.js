@@ -73,7 +73,7 @@ form.addEventListener('submit', function(e) {
 				newImg.before(newImgDraggable);
 		  	},
 			error => {
-				newImg.setAttribute('src', '../img/picture_404.svg');
+				newImg.setAttribute('src', '../img/picture_img_not_found.svg');
 				newImgDraggable.remove();
 			}
 		);
