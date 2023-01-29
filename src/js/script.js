@@ -10,8 +10,6 @@ const boardImagesContainer = document.querySelector('.board-image_container');
 const pinsContainer = document.querySelector('.board-pins_container');
 const paletteContainer = document.querySelector('.board-palette_container');
 
-
-
 //---------------------------Взятие изображения по url---------------------------------------
 const form = document.querySelector('#form_new_image-url');
 const input = document.querySelector('#new_image-url');
@@ -20,25 +18,31 @@ const newImg = document.querySelector('#new_image');
 
 let newImgDraggable, leftNewImgDraggable, topNewImgDraggable;
 
-
 function loadImage(src) {
-    return new Promise(function(resolve, reject) {
-      let img = document.createElement('img');
-      img.src = src;
+	return new Promise(function(resolve, reject) {
+	  let img = document.createElement('img');
+	  img.src = src;
   
-      img.onload = () => resolve(img);
-      img.onerror = () => reject(new Error(`Ошибка загрузки изображения ${src}`));
+	  img.onload = () => resolve(img);
+	  img.onerror = () => reject(new Error(`Ошибка загрузки изображения ${src}`));
   
-      document.head.append(img);
-    });
+	  document.head.append(img);
+	});
 }
 
 input.addEventListener('dblclick', function() {
 	input.value = '';
 });
 
+function getNewDraggableImgCoordinats() {
+	leftNewImgDraggable = newImg.getBoundingClientRect().left + window.pageXOffset + 'px';
+	topNewImgDraggable = newImg.getBoundingClientRect().top + window.pageYOffset + 'px';
+	newImgDraggable.style.left = leftNewImgDraggable;
+	newImgDraggable.style.top = topNewImgDraggable;
+}
+
 form.addEventListener('submit', function(e) {
-    e.preventDefault();
+	e.preventDefault();
 
 	try {
 		let previous = document.querySelector('.draggableNewImg');
@@ -47,15 +51,15 @@ form.addEventListener('submit', function(e) {
 
 	newImgDraggable = document.createElement('img');
 
-    if (String(input.value) == '') {
-        newImg.setAttribute('src', '../img/default_picture.svg');
-        newImgDraggable.remove();
-    } else {
-        let promise = loadImage(input.value);
+	if (String(input.value) == '') {
+		newImg.setAttribute('src', '../img/default_picture.svg');
+		newImgDraggable.remove();
+	} else {
+		let promise = loadImage(input.value);
 
-        promise.then(
-            img => { 
-            	newImg.setAttribute('src', input.value);
+		promise.then(
+			img => { 
+				newImg.setAttribute('src', input.value);
 				
 				newImgDraggable.setAttribute('src', input.value);
 				newImgDraggable.classList.add('draggableNewImg');
@@ -64,19 +68,16 @@ form.addEventListener('submit', function(e) {
 				newImgDraggable.style.objectFit = 'contain';
 				newImgDraggable.style.position = 'absolute';
 				newImgDraggable.style.zIndex = 1;
-				leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
-				topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
-				newImgDraggable.style.left = leftNewImgDraggable;
-				newImgDraggable.style.top = topNewImgDraggable;
+				getNewDraggableImgCoordinats();
 
 				newImg.before(newImgDraggable);
-          	},
-            error => {
+		  	},
+			error => {
 				newImg.setAttribute('src', '../img/picture_404.svg');
 				newImgDraggable.remove();
 			}
-        );
-    }
+		);
+	}
 });
 //--------------------------------------------------------------------------------------------
 
@@ -86,17 +87,16 @@ form.addEventListener('submit', function(e) {
 const btnPins = document.querySelector('#btn_pins');
 
 const stylesForBtnPin = ['url("../img/btnStyle/white_style_pin.jpg") center center/cover no-repeat',
-						'url("../img/btnStyle/cork_style_pin.jpg") center center/cover no-repeat',
-						'url("../img/btnStyle/graphite_style_pin.jpg") center center/cover no-repeat'];
+				'url("../img/btnStyle/cork_style_pin.jpg") center center/cover no-repeat',
+				'url("../img/btnStyle/graphite_style_pin.jpg") center center/cover no-repeat'];
 
 const pinWhiteBoard = "../img/pins/pin1_style3.png";
 const pinCorkBoard = ["../img/pins/pin1_style1.png", "../img/pins/pin2_style1.png", 
-					"../img/pins/pin3_style1.png", "../img/pins/pin4_style1.png",
-					"../img/pins/pin5_style1.png"];
+				"../img/pins/pin3_style1.png", "../img/pins/pin4_style1.png",
+				"../img/pins/pin5_style1.png"];
 const pinGraphiteBoard = ["../img/pins/pin1_style2.png", "../img/pins/pin2_style2.png", 
-					"../img/pins/pin3_style2.png", "../img/pins/pin4_style2.png",
-					"../img/pins/pin5_style2.png"];
-
+				"../img/pins/pin3_style2.png", "../img/pins/pin4_style2.png",
+				"../img/pins/pin5_style2.png"];
 
 btnPins.addEventListener('click', function() {
 	let newPin = document.createElement('img');
@@ -104,8 +104,8 @@ btnPins.addEventListener('click', function() {
 	styleOfPin(newPin);
 
 	newPin.style.position = 'absolute';
-	newPin.style.left = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width / 2 + 'px';
-	newPin.style.top = canvas.getBoundingClientRect().top + canvas.getBoundingClientRect().height / 2 + 'px';
+	newPin.style.left = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width / 2 + window.pageXOffset + 'px';
+	newPin.style.top = canvas.getBoundingClientRect().top + canvas.getBoundingClientRect().height / 2 + window.pageYOffset + 'px';
 	newPin.classList.add('pin');
 
 	pinsContainer.append(newPin);
@@ -117,15 +117,14 @@ btnPins.addEventListener('click', function() {
 //------------------------------Добавление палеток на доску----------------------------------
 const btnPalette = document.querySelector('#btn_color');
 
-
 btnPalette.addEventListener('click', function(event) {
 	let newPalette = document.createElement('input');
 	newPalette.type = "color";
 	newPalette.name="bg";
 	
 	newPalette.style.position = 'absolute';
-	newPalette.style.left = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width / 2 + 'px';
-	newPalette.style.top = canvas.getBoundingClientRect().top + canvas.getBoundingClientRect().height / 2 + 'px';
+	newPalette.style.left = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width / 2 + window.pageXOffset + 'px';
+	newPalette.style.top = canvas.getBoundingClientRect().top + canvas.getBoundingClientRect().height / 2 + window.pageYOffset + 'px';
 	newPalette.classList.add('palette');
 
 	paletteContainer.append(newPalette);
@@ -144,7 +143,6 @@ const stylesForCanvas = ['url("../img/board/white_board.jpg") center center/cove
 				'url("../img/board/cork_board.jpg") center center/cover no-repeat',
 				'url("../img/board/graphite_board.jpg") center center/cover no-repeat'];
 let currentStyle = 0;
-
 
 function styleOfPin(pin) {
 	let maxWidth = '50px';
@@ -192,18 +190,18 @@ btnSwitchStyle.addEventListener('click', function() {
 			for (let i = 0; i < children.length; i++) {
 				let pinCoord = children[i].getBoundingClientRect();
 				if (pinCoord.left < canvasCoord.left) {
-					children[i].style.left = canvasCoord.left;
+					children[i].style.left = canvasCoord.left + window.pageXOffset;
 				}
 				if (pinCoord.top < canvasCoord.top) {
-					children[i].style.top = canvasCoord.top;
+					children[i].style.top = canvasCoord.top + window.pageYOffset;
 				}
 				if (pinCoord.right > canvasCoord.right) {
 					children[i].style.left = parseInt(pinCoord.left) - (parseInt(pinCoord.right) 
-											- parseInt(canvasCoord.right)) + 'px';
+											- parseInt(canvasCoord.right + window.pageXOffset)) + 'px';
 				}
 				if (pinCoord.bottom > canvasCoord.bottom) {
 					children[i].style.top = parseInt(pinCoord.top) - (parseInt(pinCoord.bottom) 
-											- parseInt(canvasCoord.bottom)) + 'px';
+											- parseInt(canvasCoord.bottom + window.pageYOffset)) + 'px';
 				}
 			}
 		}
@@ -217,12 +215,10 @@ btnSwitchStyle.addEventListener('click', function() {
 //--------------------------------Очищение доски----------------------------------------------
 const btnClearBoard = document.querySelector('#btn_clean');
 
-
 btnClearBoard.addEventListener('click', function() {
 	clearImagesContainer();
 	clearPinsContainer();
 	clearPaletteContainer();
-
 
 	function clearImagesContainer() {
 		if (boardImagesContainer.hasChildNodes()) {
@@ -250,7 +246,6 @@ btnClearBoard.addEventListener('click', function() {
 			}
 		}
 	}
-
 });
 //---------------------------------------------------------------------------------------------
 
@@ -260,7 +255,6 @@ btnClearBoard.addEventListener('click', function() {
 const btnSaveBoard = document.querySelector('#btn_save');
 const resultModalWindow = document.querySelector('.overlay_with_result');
 const paletteImgContainer = document.querySelector('.palette_img_container');
-
 
 btnSaveBoard.addEventListener('click', function() {
 	canvas.width = CANVAS_WIDTH;
@@ -292,10 +286,10 @@ btnSaveBoard.addEventListener('click', function() {
 				for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
 					let coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
 					context.drawImage(sortedImagesOnCanvas[i], 
-									parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left, 
-									parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top, 
-									parseInt(coordsImg.right - coordsImg.left), 
-									parseInt(coordsImg.bottom - coordsImg.top));
+						parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left - window.pageXOffset, 
+						parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top - window.pageYOffset, 
+						parseInt(coordsImg.right - coordsImg.left), 
+						parseInt(coordsImg.bottom - coordsImg.top));
 				}
 			}
 
@@ -304,16 +298,16 @@ btnSaveBoard.addEventListener('click', function() {
 				let children = paletteContainer.childNodes;
 				for (let i = 0; i < children.length; i++) {
 					context.beginPath();
-					context.rect(parseInt(children[i].style.left) - coordsC.left, 
-								parseInt(children[i].style.top) - coordsC.top, 
-								70.6, 70.6);
+					context.rect(parseInt(children[i].style.left) - coordsC.left - window.pageXOffset, 
+						parseInt(children[i].style.top) - coordsC.top - window.pageYOffset, 
+						70.6, 70.6);
 					context.fillStyle = "#eeeeee";
 					context.fill();
 
 					context.beginPath();
-					context.rect(parseInt(children[i].style.left) + 5 - coordsC.left, 
-										parseInt(children[i].style.top) + 5 - coordsC.top, 
-										60, 60);
+					context.rect(parseInt(children[i].style.left) + 5 - coordsC.left - window.pageXOffset, 
+						parseInt(children[i].style.top) + 5 - coordsC.top - window.pageYOffset, 
+						60, 60);
 					context.fillStyle = children[i].value;
 					context.fill();
 					context.lineWidth = 0.3;
@@ -325,11 +319,11 @@ btnSaveBoard.addEventListener('click', function() {
 			if (pinsContainer.hasChildNodes()) {
 				let children = pinsContainer.childNodes;
 				children.forEach(element => {context.drawImage(element, 
-									parseInt(element.style.left) - coordsC.left, 
-									parseInt(element.style.top) - coordsC.top, 
-									parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), 
-									parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top))
-							});
+					parseInt(element.style.left) - coordsC.left - window.pageXOffset, 
+					parseInt(element.style.top) - coordsC.top - window.pageYOffset, 
+					parseInt(element.getBoundingClientRect().right - element.getBoundingClientRect().left), 
+					parseInt(element.getBoundingClientRect().bottom - element.getBoundingClientRect().top))
+				});
 			}
 
 			boardImagesContainer.style.display = 'none';
@@ -343,7 +337,6 @@ btnSaveBoard.addEventListener('click', function() {
 
 		error => {alert("Try again, please")}
 	)
-
 
 	function mergeSort(array) {
 		if (!array || !array.length) {
@@ -384,7 +377,6 @@ btnSaveBoard.addEventListener('click', function() {
 //-----------------------Возвращение в режим редактирования------------------------------------
 const continueBottom = document.querySelector('#continue');
 
-
 continueBottom.addEventListener('click', function() {
 	context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -397,11 +389,7 @@ continueBottom.addEventListener('click', function() {
 	resultModalWindow.style.zIndex = -2;
 
 	if (newImgDraggable) {
-		newImgDraggable.style.position = 'absolute';
-		leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
-		topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
-		newImgDraggable.style.left =leftNewImgDraggable;
-		newImgDraggable.style.top = topNewImgDraggable;
+		getNewDraggableImgCoordinats();
 	}
 });
 //----------------------------------------------------------------------------------------
@@ -409,23 +397,18 @@ continueBottom.addEventListener('click', function() {
 
 
 //------------------------------Реакция на маштабирование---------------------------------
-let positionStart = parseInt(canvas.getBoundingClientRect().left).toFixed(0);
-let positionNow = parseInt(canvas.getBoundingClientRect().left).toFixed(0);
+let positionStartX = parseInt(canvas.getBoundingClientRect().left + window.pageXOffset).toFixed(0);
+let positionNowX = parseInt(canvas.getBoundingClientRect().left + window.pageXOffset).toFixed(0);
 let dX = 0;
 
-
 window.addEventListener('resize', (e) => {
-	positionNow = parseInt(canvas.getBoundingClientRect().left).toFixed(0);
-	dX = (positionNow - positionStart).toFixed(0);
-	positionStart = positionNow;
+	positionNowX = parseInt(canvas.getBoundingClientRect().left + window.pageXOffset).toFixed(0);
+	dX = (positionNowX - positionStartX).toFixed(0);
+	positionStartX = positionNowX;;
 
 	//Передвигаемую копию newImg кладем поверх newImg
 	if (newImgDraggable) {
-		newImgDraggable.style.position = 'absolute';
-		leftNewImgDraggable = newImg.getBoundingClientRect().left + 'px';
-		topNewImgDraggable = newImg.getBoundingClientRect().top + 'px';
-		newImgDraggable.style.left =leftNewImgDraggable;
-		newImgDraggable.style.top = topNewImgDraggable;
+		getNewDraggableImgCoordinats();
 	}
 
 	//Передвигаем картинки
@@ -437,7 +420,7 @@ window.addEventListener('resize', (e) => {
 	//Передвигаем палетки
 	if (paletteContainer.hasChildNodes()) {
 		let children = paletteContainer.childNodes;
-		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) + 'px');
+		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) +  'px');
 	  }
 
 	//Передвигаем пины
@@ -446,7 +429,6 @@ window.addEventListener('resize', (e) => {
 		let children = pinsContainer.childNodes;
 		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) + 'px');
 	}
-
 });
 //----------------------------------------------------------------------------------------
 
@@ -459,30 +441,27 @@ const COLOR_DELETE_ZONE_V = 'rgba(255, 180, 180, 0.4)';
 const COLOR_DELETE_ZONE_H = 'rgba(255, 180, 180, 0)';
 let isDragging = false;
 
-
 document.addEventListener('mousedown', function(event) {
 	let dragElement = event.target.closest('.pin');
-    let typeOfDragElement = "pin";
+	let typeOfDragElement = "pin";
 	if (!dragElement) {
 		dragElement = event.target.closest('.palette');
-        typeOfDragElement = "palette";
-        if (!dragElement) {
-            dragElement = event.target.closest('.draggableNewImg');
-            typeOfDragElement = "draggableNewImg";
-            if (!dragElement) {
-                dragElement = event.target.closest('.onboardImg');
-                typeOfDragElement = "onboardImg";
-	            if (!dragElement) {
-		            return;
-	            }
-            }
-        }
+		typeOfDragElement = "palette";
+		if (!dragElement) {
+			dragElement = event.target.closest('.draggableNewImg');
+			typeOfDragElement = "draggableNewImg";
+			if (!dragElement) {
+				dragElement = event.target.closest('.onboardImg');
+				typeOfDragElement = "onboardImg";
+				if (!dragElement) {
+					return;
+				}
+			}
+		}
 	}
 
 	event.preventDefault();
-	dragElement.ondragstart = function() {
-    	return false;
-	};
+	dragElement.ondragstart = () => false;
 
 	shiftDraggableLayer();
 	hiddenInterface();
@@ -494,26 +473,25 @@ document.addEventListener('mousedown', function(event) {
   	startDrag(dragElement, event.clientX, event.clientY);
 
 	function onMouseUp(event) {
-        finishDrag();
-        if (typeOfDragElement == "draggableNewImg") {
-            let dragElementCopy = document.createElement('img');
-            dragElementCopy.setAttribute('src', dragElement.src);
-            dragElementCopy.style.maxHeight = MAX_IMG_HEIGHT;
-            dragElementCopy.style.maxWidth = MAX_IMG_WIDTH;
-            dragElementCopy.style.objectFit = 'contain';
-            dragElementCopy.style.position = 'absolute';
+		finishDrag();
+		if (typeOfDragElement == "draggableNewImg") {
+			let dragElementCopy = document.createElement('img');
+			dragElementCopy.classList.add('onboardImg');
 
-            dragElementCopy.style.top = dragElement.getBoundingClientRect().top + 'px';
-            dragElementCopy.style.left = dragElement.getBoundingClientRect().left + 'px';
+			dragElementCopy.setAttribute('src', dragElement.src);
+			dragElementCopy.style.maxHeight = MAX_IMG_HEIGHT;
+			dragElementCopy.style.maxWidth = MAX_IMG_WIDTH;
+			dragElementCopy.style.objectFit = 'contain';
+			dragElementCopy.style.position = 'absolute';
 
-            zIndexChange(dragElementCopy, 1);
+			dragElementCopy.style.top = dragElement.getBoundingClientRect().top + window.pageYOffset + 'px';
+			dragElementCopy.style.left = dragElement.getBoundingClientRect().left + window.pageXOffset + 'px';
+			getNewDraggableImgCoordinats();
 
-            dragElementCopy.classList.add('onboardImg');
-            boardImagesContainer.append(dragElementCopy);
-
-            newImgDraggable.style.top = topNewImgDraggable;
-            newImgDraggable.style.left = leftNewImgDraggable;
-        }
+			zIndexChange(dragElementCopy, 1);
+			
+			boardImagesContainer.append(dragElementCopy);
+		}
 	};
 
 	function onMouseMove(event) {
@@ -521,11 +499,11 @@ document.addEventListener('mousedown', function(event) {
 
 		getCanvasAndElementCoordinats()
 		if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) {
-			if (typeOfDragElement != "draggableNewImg") {
+			if (typeOfDragElement !== "draggableNewImg") {
 				showDeleteZone();
 			}
 		} else {
-			if (typeOfDragElement != "draggableNewImg") {
+			if (typeOfDragElement !== "draggableNewImg") {
 				hiddenDeleteZone();
 			}
 		}
@@ -544,7 +522,7 @@ document.addEventListener('mousedown', function(event) {
 		shiftX = clientX - element.getBoundingClientRect().left;
 		shiftY = clientY - element.getBoundingClientRect().top;
 	
-		element.style.position = 'fixed';
+		element.style.position = 'absolute';
 
 		moveAt(clientX, clientY);
 	};
@@ -556,31 +534,32 @@ document.addEventListener('mousedown', function(event) {
 	
 		isDragging = false;
 
-        getCanvasAndElementCoordinats();
+		getCanvasAndElementCoordinats();
 		if ((topE >= topC && bottomE <= bottomC) && (leftE >= leftC && rightE <= rightC)) {
-		  	dragElement.style.top = parseInt(dragElement.style.top) + 'px';
+				dragElement.style.top = topE + scrollY + 'px';
+				dragElement.style.left = leftE + scrollX + 'px';
 		} else { 
 			if ((bottomE < topC) || (leftE > rightC) || (topE > bottomC) || (rightE < leftC)) {
-                if (typeOfDragElement != "draggableNewImg") {
-                    dragElement.remove();
+				if (typeOfDragElement !== "draggableNewImg") {
+					dragElement.remove();
 					hiddenDeleteZone();
-                } else {
+				} else {
 					if (typeOfDragElement == "pin" || typeOfDragElement == "palette") {
-						dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
-						dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
+						dragElement.style.left = leftC + (rightC - leftC) / 2 + scrollX + 'px';
+						dragElement.style.top = topC + (bottomC - topC) / 2 + scrollY + 'px';
 					} else {
-						dragElement.style.left = leftC + 15 + 'px';
-						dragElement.style.top = topC + 15 + 'px';
+						dragElement.style.left = leftC + 15 + scrollX + 'px';
+						dragElement.style.top = topC + 15 + scrollY + 'px';
 					}
-                }
+				}
 			} else {
-                if (typeOfDragElement == "pin" || typeOfDragElement == "palette") {
-                    dragElement.style.left = leftC + (rightC - leftC) / 2 + 'px';
-				    dragElement.style.top = topC + (bottomC - topC) / 2 + 'px';
-                } else {
-                    dragElement.style.left = leftC + 15 + 'px';
-		   		    dragElement.style.top = topC + 15 + 'px';
-                }
+				if (typeOfDragElement == "pin" || typeOfDragElement == "palette") {
+					dragElement.style.left = leftC + (rightC - leftC) / 2 + scrollX + 'px';
+					dragElement.style.top = topC + (bottomC - topC) / 2 + scrollY + 'px';
+				} else {
+					dragElement.style.left = leftC + 15 + scrollX + 'px';
+		   			dragElement.style.top = topC + 15 + scrollY + 'px';
+				}
 				
 			}
 		}
@@ -588,7 +567,7 @@ document.addEventListener('mousedown', function(event) {
 		document.removeEventListener('mousemove', onMouseMove);
 		dragElement.removeEventListener('mouseup', onMouseUp);
 
-        showInterface();
+		showInterface();
 
 		shiftAllLayers();
 	}
@@ -606,19 +585,18 @@ document.addEventListener('mousedown', function(event) {
 
 	function shiftAllLayers() {
 		if (typeOfDragElement == "onboardImg") {
-            if (boardImagesContainer.hasChildNodes()) {
-                let children = boardImagesContainer.childNodes;
-                children.forEach( function(elem) {
-                    if (elem.style.zIndex > zIndex) {
-                        elem.style.zIndex = elem.style.zIndex - 1;
-                    }
-                });
-            }
-        }
+			if (boardImagesContainer.hasChildNodes()) {
+				let children = boardImagesContainer.childNodes;
+				children.forEach( function(elem) {
+					if (elem.style.zIndex > zIndex) {
+						elem.style.zIndex = elem.style.zIndex - 1;
+					}
+				});
+			}
+		}
 	}
 	
 	function moveAt(clientX, clientY) {
-		
 		let newX = clientX - shiftX;
 		let newY = clientY - shiftY;
 	
@@ -650,32 +628,32 @@ document.addEventListener('mousedown', function(event) {
 			  newX = document.documentElement.clientWidth - dragElement.offsetWidth;
 		}
 	
-		dragElement.style.left = newX + 'px';
-		dragElement.style.top = newY + 'px';		
+		dragElement.style.left = newX + window.pageXOffset + 'px';
+		dragElement.style.top = newY + window.pageYOffset + 'px';		
 	}
 
 	function showDeleteZone() {
-		if (typeOfDragElement != "draggableNewImg") {
-		    deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_V;
-        }
+		if (typeOfDragElement !== "draggableNewImg") {
+			deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_V;
+		}
 	}
 
 	function hiddenDeleteZone() {
-		if (typeOfDragElement != "draggableNewImg") {
-            deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_H;
-        }
+		if (typeOfDragElement !== "draggableNewImg") {
+			deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_H;
+		}
 	}
 
 	function showInterface() {
-		if (typeOfDragElement != "draggableNewImg") {
-		    interface.style.zIndex = '0';
-        }
+		if (typeOfDragElement !== "draggableNewImg") {
+			interface.style.zIndex = '0';
+		}
 	}
 
 	function hiddenInterface() {
-		if (typeOfDragElement != "draggableNewImg") {
-		    interface.style.zIndex = '-2';
-        }
+		if (typeOfDragElement !== "draggableNewImg") {
+			interface.style.zIndex = '-2';
+		}
 	}
 
 	function getCanvasAndElementCoordinats() {
