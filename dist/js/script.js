@@ -71,7 +71,7 @@ form.addEventListener('submit', function(e) {
 				getNewDraggableImgCoordinats();
 
 				newImg.before(newImgDraggable);
-				},
+			},
 			error => {
 				newImg.setAttribute('src', '../img/picture_img_not_found.svg');
 				newImgDraggable.remove();
@@ -206,21 +206,6 @@ btnSwitchStyle.addEventListener('click', function() {
 				if (pinCoordLeft < canvasCoordLeft) {
 					children[i].style.left = canvasCoordLeft + window.pageXOffset;
 				}
-
-				// if (pinCoord.left < canvasCoord.left) {
-				// 	children[i].style.left = canvasCoord.left + window.pageXOffset;
-				// }
-				// if (pinCoord.top < canvasCoord.top) {
-				// 	children[i].style.top = canvasCoord.top + window.pageYOffset;
-				// }
-				// if (pinCoord.right > canvasCoord.right) {
-				// 	children[i].style.left = parseInt(pinCoord.left) - (parseInt(pinCoord.right) 
-				// 							- parseInt(canvasCoord.right + window.pageXOffset)) + 'px';
-				// }
-				// if (pinCoord.bottom > canvasCoord.bottom) {
-				// 	children[i].style.top = parseInt(pinCoord.top) - (parseInt(pinCoord.bottom) 
-				// 							- parseInt(canvasCoord.bottom + window.pageYOffset)) + 'px';
-				// }
 			}
 		}
 	}
@@ -436,7 +421,7 @@ window.addEventListener('resize', (e) => {
 	if (paletteContainer.hasChildNodes()) {
 		let children = paletteContainer.childNodes;
 		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) +  'px');
-		}
+	}
 
 	//Передвигаем пины
 	pinsContainer.childElementCount;
@@ -459,7 +444,7 @@ let isDragging = false;
 document.addEventListener('mousedown', function(event) {
 	let dragElement, typeOfDragElement;
 	if (!(isTypeOfDragElement("pin") || isTypeOfDragElement("palette") || 
-	isTypeOfDragElement("draggableNewImg") || isTypeOfDragElement("onboardImg"))) {
+		isTypeOfDragElement("draggableNewImg") || isTypeOfDragElement("onboardImg"))) {
 		return;
 	}
 
