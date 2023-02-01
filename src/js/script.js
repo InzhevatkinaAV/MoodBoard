@@ -184,13 +184,17 @@ function randomInt(min, max) {
 	return Math.round(rand);
 }
 
+function getUrlFromStyle(backgroundStyle) {
+	const startURL = backgroundStyle.indexOf('(');
+	const finishURL = backgroundStyle.indexOf(')');
+	return backgroundStyle.slice(startURL + 2, finishURL - 1);
+}
+
 btnSwitchStyle.addEventListener('click', function() {
 	currentStyle = ++currentStyle % 3;
 
 	//Изменение фона канваса
-	const startURL = stylesForCanvas[currentStyle].indexOf('(');
-	const finishURL = stylesForCanvas[currentStyle].indexOf(')');
-	const url = stylesForCanvas[currentStyle].slice(startURL + 2, finishURL - 1);
+	const url = getUrlFromStyle(stylesForCanvas[currentStyle]);
 	let promise = loadImage(url);
 	promise.then(
 		img => {
@@ -203,8 +207,22 @@ btnSwitchStyle.addEventListener('click', function() {
 	changePinsStyle();
 
 	function changeBtnStyle() {
-		btnSwitchStyle.style.background = stylesForBtn[currentStyle];
-		btnPins.style.background = stylesForBtnPin[currentStyle];
+		let urlStyleBtn = getUrlFromStyle(stylesForBtn[currentStyle]);
+
+		let promiseStyleBtn = loadImage(urlStyleBtn);
+		promiseStyleBtn.then(
+			img => { 
+				btnSwitchStyle.style.background = 'url(' + urlStyleBtn + ') center center/cover no-repeat';
+			},
+		);
+
+		let urlPinBtn = getUrlFromStyle(stylesForBtnPin[currentStyle]);
+		let promisePinBtn = loadImage(url);
+		promisePinBtn.then(
+			img => { 
+				btnPins.style.background = 'url(' + urlPinBtn + ') center center/cover no-repeat';
+			},
+		);
 	}
 
 	function changePinsStyle() {
@@ -257,7 +275,6 @@ btnClearBoard.addEventListener('click', function() {
 			}
 		}
 	}
-
 });
 //---------------------------------------------------------------------------------------------
 
@@ -276,9 +293,7 @@ btnSaveBoard.addEventListener('click', function() {
 
 	//Отрисовка фона
 	const backgroundImg = new Image();
-	const startURL = stylesForCanvas[currentStyle].indexOf('(');
-	const finishURL = stylesForCanvas[currentStyle].indexOf(')');
-	const url = stylesForCanvas[currentStyle].slice(startURL + 2, finishURL - 1);
+	const url = getUrlFromStyle(stylesForCanvas[currentStyle]);
 	backgroundImg.src = url;
 	backgroundImg.width = canvas.width;
 	backgroundImg.height = canvas.height;
