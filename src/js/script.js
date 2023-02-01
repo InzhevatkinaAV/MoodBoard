@@ -25,8 +25,6 @@ function loadImage(src) {
 		
 		img.onload = () => resolve(img);
 		img.onerror = () => reject(new Error(`Ошибка загрузки изображения ${src}`));
-		
-		document.head.append(img);
 	});
 }
 
@@ -146,20 +144,39 @@ let currentStyle = 0;
 
 function styleOfPin(pin) {
 	let maxWidth = '50px';
+	let numSrc = randomInt(0, 4);
+	let promise;
 
 	switch (currentStyle) {
-		case 0: 
-			pin.setAttribute('src', pinWhiteBoard);
+		case 0:
+			promise = loadImage(pinWhiteBoard);
+			promise.then(
+				img => { 
+					pin.setAttribute('src', pinWhiteBoard);
+					pin.style.maxWidth = maxWidth;
+				},
+			);
 			break;
 		case 1: 
-			pin.setAttribute('src', pinCorkBoard[randomInt(0, 4)]); 
+			promise = loadImage(pinCorkBoard[numSrc]);
+			promise.then(
+				img => { 
+					pin.setAttribute('src', pinCorkBoard[numSrc]);
+					pin.style.maxWidth = maxWidth;
+				},
+			);
 			break;
 		case 2:
-			pin.setAttribute('src', pinGraphiteBoard[randomInt(0, 4)]); 
-			maxWidth = '100px';
+			promise = loadImage(pinGraphiteBoard[numSrc]);
+			promise.then(
+				img => { 
+					pin.setAttribute('src', pinGraphiteBoard[numSrc]);
+					maxWidth = '100px';
+					pin.style.maxWidth = maxWidth;
+				},
+			);
 			break;
 	}
-	pin.style.maxWidth = maxWidth;
 }
 
 function randomInt(min, max) {
@@ -170,10 +187,20 @@ function randomInt(min, max) {
 btnSwitchStyle.addEventListener('click', function() {
 	currentStyle = ++currentStyle % 3;
 
-	canvas.style.background = stylesForCanvas[currentStyle];
+	//Изменение фона канваса
+	const startURL = stylesForCanvas[currentStyle].indexOf('(');
+	const finishURL = stylesForCanvas[currentStyle].indexOf(')');
+	const url = stylesForCanvas[currentStyle].slice(startURL + 2, finishURL - 1);
+	let promise = loadImage(url);
+	promise.then(
+		img => {
+			canvas.style.background = 'url(' + url + ') center center/cover no-repeat';
+		}
+	);
+	
+	//Изменение стиля кнопок и пинов
 	changeBtnStyle();
 	changePinsStyle();
-
 
 	function changeBtnStyle() {
 		btnSwitchStyle.style.background = stylesForBtn[currentStyle];
@@ -218,36 +245,19 @@ btnSwitchStyle.addEventListener('click', function() {
 const btnClearBoard = document.querySelector('#btn_clean');
 
 btnClearBoard.addEventListener('click', function() {
-	clearImagesContainer();
-	clearPinsContainer();
-	clearPaletteContainer();
+	clear(boardImagesContainer);
+	clear(pinsContainer);
+	clear(paletteContainer);
 
-	function clearImagesContainer() {
-		if (boardImagesContainer.hasChildNodes()) {
-			const children = boardImagesContainer.childNodes;
+	function clear(container) {
+		if (container.hasChildNodes()) {
+			const children = container.childNodes;
 			while (children.length > 0) {
 				children[0].remove();
 			}
 		}
 	}
-	
-	function clearPinsContainer() {
-		if (pinsContainer.hasChildNodes()) {
-			const children = pinsContainer.childNodes;
-			while (children.length > 0) {
-				children[0].remove();
-			}
-		}
-	}
-	
-	function clearPaletteContainer() {
-		if (paletteContainer.hasChildNodes()) {
-			const children = paletteContainer.childNodes;
-			while (children.length > 0) {
-				children[0].remove();
-			}
-		}
-	}
+
 });
 //---------------------------------------------------------------------------------------------
 
@@ -411,23 +421,16 @@ window.addEventListener('resize', (e) => {
 		getNewDraggableImgCoordinats();
 	}
 
-	//Передвигаем картинки
-	if (boardImagesContainer.hasChildNodes()) {
-		let children = boardImagesContainer.childNodes;
-		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) + 'px');
-	}
+	//Передвигаем картинки, палетки, пины
+	move(boardImagesContainer);
+	move(paletteContainer);
+	move(pinsContainer);
 
-	//Передвигаем палетки
-	if (paletteContainer.hasChildNodes()) {
-		let children = paletteContainer.childNodes;
-		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) +  'px');
-	}
-
-	//Передвигаем пины
-	pinsContainer.childElementCount;
-	if (pinsContainer.hasChildNodes()) {
-		let children = pinsContainer.childNodes;
-		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) + 'px');
+	function move(container) {
+		if (container.hasChildNodes()) {
+			let children = container.childNodes;
+			children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) + 'px');
+		}
 	}
 });
 //----------------------------------------------------------------------------------------
@@ -458,7 +461,7 @@ document.addEventListener('mousedown', function(event) {
 	let topC, bottomC, leftC, rightC;
 	let topE, bottomE, leftE, rightE;
 
-		startDrag(dragElement, event.clientX, event.clientY);
+	startDrag(dragElement, event.clientX, event.clientY);
 
 	function onMouseUp(event) {
 		finishDrag();
