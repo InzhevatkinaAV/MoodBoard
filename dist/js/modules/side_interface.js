@@ -5,29 +5,19 @@ const sideAdvice = document.querySelector('.advice');
 
 //-----------------------------------------Общее------------------------------------------
 export function changeDisplaySideInterface(str) {
-    if (str === "on") {
-        sideInterface.style.display = 'flex';
-    }
-    if (str === "off") {
-        sideInterface.style.display = 'none';
-    }
+	str === "on" ? sideInterface.style.display = 'flex' : sideInterface.style.display = 'none';
 }
 
 export function changeDisplaySideAdvice(str) {
-    if (str === "on") {
-        sideAdvice.style.display = 'flex';
-    }
-    if (str === "off") {
-        sideAdvice.style.display = 'none';
-    }
+	str === "on" ? sideAdvice.style.display = 'flex' : sideAdvice.style.display = 'none';
 }
 
 export function upSideInterface() {
-    sideInterface.style.zIndex = '0';
+	sideInterface.style.zIndex = '0';
 }
 
 export function downSideInterface() {
-    sideInterface.style.zIndex = '-2';
+	sideInterface.style.zIndex = '-2';
 }
 
 //-----------------------------Зона удаления элементов с доски----------------------------
@@ -36,19 +26,19 @@ const COLOR_DELETE_ZONE_V = 'rgba(255, 180, 180, 0.4)';
 const COLOR_DELETE_ZONE_H = 'rgba(255, 180, 180, 0)';
 
 export function showDeleteZone() {
-    deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_V;
+	deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_V;
 }
 
 export function hiddenDeleteZone() {
-        deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_H;
+	deleteZone.style.backgroundColor = COLOR_DELETE_ZONE_H;
 }
 
-//---------------------------Передвигаемая копия изображения------------------------------
+//-----------------------Передвигаемая копия изображения в меню----------------------------
 let leftNewImgDraggable, topNewImgDraggable;
 const MAX_IMG_WIDTH = '276px';
 const MAX_IMG_HEIGHT = '255px';
 
-export function getNewDraggableImgCoordinats(newImgDraggable, newImg) {
+export function setNewDraggableImgCoordinats(newImgDraggable, newImg) {
 	leftNewImgDraggable = newImg.getBoundingClientRect().left + window.pageXOffset + 'px';
 	topNewImgDraggable = newImg.getBoundingClientRect().top + window.pageYOffset + 'px';
 	newImgDraggable.style.left = leftNewImgDraggable;
@@ -56,7 +46,7 @@ export function getNewDraggableImgCoordinats(newImgDraggable, newImg) {
 }
 
 export function createNewDraggableImg(newImgDraggable, newImg) {
-    newImgDraggable.setAttribute('src', newImg.src);
+	newImgDraggable.setAttribute('src', newImg.src);
 	newImgDraggable.classList.add('draggableNewImg');
 	newImgDraggable.style.maxHeight = MAX_IMG_HEIGHT;
 	newImgDraggable.style.maxWidth = MAX_IMG_WIDTH;
@@ -64,9 +54,9 @@ export function createNewDraggableImg(newImgDraggable, newImg) {
 	newImgDraggable.style.position = 'absolute';
 	newImgDraggable.style.zIndex = 1;
 
-	getNewDraggableImgCoordinats(newImgDraggable, newImg);
+	setNewDraggableImgCoordinats(newImgDraggable, newImg);
 
-    newImg.before(newImgDraggable);
+	newImg.before(newImgDraggable);
 }
 
 //-------------------------------Изменение стиля кнопок-----------------------------------

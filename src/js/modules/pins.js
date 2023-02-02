@@ -14,7 +14,7 @@ export function createNewPin(canvas, currentStyle) {
 	const newPin = document.createElement('img');
 	
 	styleOfPin(newPin, currentStyle);
-    newPin.classList.add('pin');
+	newPin.classList.add('pin');
 
 	newPin.style.position = 'absolute';
 	newPin.style.left = canvas.getBoundingClientRect().left + canvas.getBoundingClientRect().width / 2 + window.pageXOffset + 'px';
@@ -28,7 +28,7 @@ function addNewPin(newPin) {
 }
 
 export function drawPins(canvas, context) {
-    const coordsC = canvas.getBoundingClientRect();
+	const coordsC = canvas.getBoundingClientRect();
 
 	if (pinsContainer.hasChildNodes()) {
 		const children = pinsContainer.childNodes;
@@ -42,43 +42,43 @@ export function drawPins(canvas, context) {
 }
 
 export function changePinsStyle(canvas, currentStyle) {
-    if (pinsContainer.hasChildNodes()) {
-        const children = pinsContainer.childNodes;
+	if (pinsContainer.hasChildNodes()) {
+		const children = pinsContainer.childNodes;
 
-        children.forEach(element => styleOfPin(element, currentStyle));
+		children.forEach(element => styleOfPin(element, currentStyle));
 
-        const canvasCoord = canvas.getBoundingClientRect();
-        let {top: canvasCoordTop, right: canvasCoordRight, bottom: canvasCoordBottom, left: canvasCoordLeft} = canvasCoord;
+		const canvasCoord = canvas.getBoundingClientRect();
+		let {top: canvasCoordTop, right: canvasCoordRight, bottom: canvasCoordBottom, left: canvasCoordLeft} = canvasCoord;
 
-        let width, height;
-        if (currentStyle == 2) {
-            width = 100;
-            height = 100;
-        } else {
-            width = 50;
-            height = 50;
-        }
-        
-        for (let i = 0; i < children.length; i++) {
-            const pinCoord = children[i].getBoundingClientRect();
-            let {top: pinCoordTop, right: pinCoordRight, bottom: pinCoordBottom, left: pinCoordLeft} = pinCoord;
+		let width, height;
+		if (currentStyle == 2) {
+			width = 100;
+			height = 100;
+		} else {
+			width = 50;
+			height = 50;
+		}
+		
+		for (let i = 0; i < children.length; i++) {
+			const pinCoord = children[i].getBoundingClientRect();
+			let {top: pinCoordTop, right: pinCoordRight, bottom: pinCoordBottom, left: pinCoordLeft} = pinCoord;
 
-            if (pinCoordTop < canvasCoordTop) {
-                children[i].style.top = canvasCoordTop + window.pageYOffset;
-            }
-            if (pinCoordLeft + width > canvasCoordRight) {
-                children[i].style.left = parseInt(pinCoordLeft) - (parseInt(pinCoordLeft + width) 
-                                        - parseInt(canvasCoordRight + window.pageXOffset)) + 'px';
-            }
-            if (pinCoordTop + height > canvasCoordBottom) {
-                children[i].style.top = parseInt(pinCoordTop) - (parseInt(pinCoordTop + height) 
-                                        - parseInt(canvasCoordBottom + window.pageYOffset)) + 'px';
-            }
-            if (pinCoordLeft < canvasCoordLeft) {
-                children[i].style.left = canvasCoordLeft + window.pageXOffset;
-            }
-        }
-    }
+			if (pinCoordTop < canvasCoordTop) {
+				children[i].style.top = canvasCoordTop + window.pageYOffset;
+			}
+			if (pinCoordLeft + width > canvasCoordRight) {
+				children[i].style.left = parseInt(pinCoordLeft) - (parseInt(pinCoordLeft + width) 
+										- parseInt(canvasCoordRight + window.pageXOffset)) + 'px';
+			}
+			if (pinCoordTop + height > canvasCoordBottom) {
+				children[i].style.top = parseInt(pinCoordTop) - (parseInt(pinCoordTop + height) 
+										- parseInt(canvasCoordBottom + window.pageYOffset)) + 'px';
+			}
+			if (pinCoordLeft < canvasCoordLeft) {
+				children[i].style.left = canvasCoordLeft + window.pageXOffset;
+			}
+		}
+	}
 }
 
 function styleOfPin(pin, currentStyle) {
@@ -119,13 +119,13 @@ function styleOfPin(pin, currentStyle) {
 }
 
 export function movePinsForResizeWindow(dX) {
-    moveForResizeWindow(pinsContainer, dX);
+	moveForResizeWindow(pinsContainer, dX);
 }
 
 export function clearBoardFromPins() {
-    clear(pinsContainer);
+	clear(pinsContainer);
 }
 
 export function changeDisplayPinContainer(propertyName) {
-    pinsContainer.style.display = propertyName;
+	pinsContainer.style.display = propertyName;
 }

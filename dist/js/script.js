@@ -1,5 +1,6 @@
 import {createNewBoardImage, drawImages, changeDisplayImagesContainer, 
-	moveImagesForResizeWindow, clearBoardFromImages, zIndexChange, shiftImagesLayers} from "./modules/board-images.js";
+	moveImagesForResizeWindow, clearBoardFromImages, 
+	zIndexChange, shiftImagesLayers} from "./modules/board-images.js";
 
 import {createNewPin, changePinsStyle, drawPins, changeDisplayPinContainer, 
 	movePinsForResizeWindow, clearBoardFromPins} from "./modules/pins.js";
@@ -10,7 +11,7 @@ import {createNewPalette, drawPaletts, changeDisplayPaletteContainer,
 import {changeDisplaySideInterface, changeDisplaySideAdvice, changeBtnStyle,
 	downSideInterface, upSideInterface,
 	showDeleteZone, hiddenDeleteZone,
-	createNewDraggableImg, getNewDraggableImgCoordinats} from "./modules/side_interface.js";
+	createNewDraggableImg, setNewDraggableImgCoordinats} from "./modules/side_interface.js";
 
 import {loadImage, getUrlFromStyle} from "./modules/help_functions.js";
 
@@ -159,7 +160,7 @@ continueBottom.addEventListener('click', function() {
 	changeDisplaySideInterface("on");
 
 	if (newImgDraggable) {
-		getNewDraggableImgCoordinats(newImgDraggable, newImg);
+		setNewDraggableImgCoordinats(newImgDraggable, newImg);
 	}
 });
 
@@ -173,7 +174,7 @@ window.addEventListener('resize', (e) => {
 
 	//Передвигаемую копию newImg помещаем поверх newImg
 	if (newImgDraggable) {
-		getNewDraggableImgCoordinats(newImgDraggable, newImg);
+		setNewDraggableImgCoordinats(newImgDraggable, newImg);
 	}
 
 	//Передвигаем картинки, палетки, пины
@@ -215,7 +216,7 @@ document.addEventListener('mousedown', function(event) {
 		finishDrag();
 		if (typeOfDragElement == "draggableNewImg") {
 			createNewBoardImage(dragElement);
-			getNewDraggableImgCoordinats(newImgDraggable, newImg);
+			setNewDraggableImgCoordinats(newImgDraggable, newImg);
 		}
 	};
 
@@ -329,9 +330,11 @@ document.addEventListener('mousedown', function(event) {
 		}
 	
 	
-		if (newX < 0) newX = 0;
+		if (newX < 0) {
+			newX = 0;
+		} 
 		if (newX > document.documentElement.clientWidth - dragElement.offsetWidth) {
-				newX = document.documentElement.clientWidth - dragElement.offsetWidth;
+			newX = document.documentElement.clientWidth - dragElement.offsetWidth;
 		}
 	
 		dragElement.style.left = newX + window.pageXOffset + 'px';

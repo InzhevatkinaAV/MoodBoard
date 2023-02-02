@@ -5,7 +5,7 @@ const MAX_IMG_WIDTH = '276px';
 const MAX_IMG_HEIGHT = '255px';
 
 export function createNewBoardImage(dragElement) {
-    const dragElementCopy = document.createElement('img');
+	const dragElementCopy = document.createElement('img');
 	dragElementCopy.classList.add('onboardImg');
 
 	dragElementCopy.setAttribute('src', dragElement.src);
@@ -17,58 +17,57 @@ export function createNewBoardImage(dragElement) {
 	dragElementCopy.style.top = dragElement.getBoundingClientRect().top + window.pageYOffset + 'px';
 	dragElementCopy.style.left = dragElement.getBoundingClientRect().left + window.pageXOffset + 'px';
 
-    zIndexChange(dragElementCopy, 1);
+	zIndexChange(dragElementCopy, 1);
 
-    addImageOnBoard(dragElementCopy);
+	addImageOnBoard(dragElementCopy);
 }
 
 function addImageOnBoard(dragElementCopy) {
-    boardImagesContainer.append(dragElementCopy);
+	boardImagesContainer.append(dragElementCopy);
 }
 
 export function drawImages(canvas, context) {
-    const coordsC = canvas.getBoundingClientRect();
+	const coordsC = canvas.getBoundingClientRect();
 
-    if (boardImagesContainer.hasChildNodes()) {
-        const children = boardImagesContainer.childNodes;
-        let imagesOnCanvas = [];
-        children.forEach(elem => imagesOnCanvas.push(elem));
-        const sortedImagesOnCanvas = mergeSort(imagesOnCanvas);
-        for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
-            const coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
-            context.drawImage(sortedImagesOnCanvas[i], 
-                parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left - window.pageXOffset, 
-                parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top - window.pageYOffset, 
-                parseInt(coordsImg.right - coordsImg.left), 
-                parseInt(coordsImg.bottom - coordsImg.top));
-        }
-    }
+	if (boardImagesContainer.hasChildNodes()) {
+		const children = boardImagesContainer.childNodes;
+		let imagesOnCanvas = [];
+		children.forEach(elem => imagesOnCanvas.push(elem));
+		const sortedImagesOnCanvas = mergeSort(imagesOnCanvas);
+		for (let i = 0; i < sortedImagesOnCanvas.length; i++) {
+			const coordsImg = sortedImagesOnCanvas[i].getBoundingClientRect();
+			context.drawImage(sortedImagesOnCanvas[i], 
+				parseInt(sortedImagesOnCanvas[i].style.left) - coordsC.left - window.pageXOffset, 
+				parseInt(sortedImagesOnCanvas[i].style.top) - coordsC.top - window.pageYOffset, 
+				parseInt(coordsImg.right - coordsImg.left), 
+				parseInt(coordsImg.bottom - coordsImg.top));
+		}
+	}
 }
 
 export function zIndexChange(obj, num) {
-    obj.style.zIndex = boardImagesContainer.childElementCount + num;
+	obj.style.zIndex = boardImagesContainer.childElementCount + num;
 }
 
 export function shiftImagesLayers(zIndex) {
-    if (boardImagesContainer.hasChildNodes()) {
-        let children = boardImagesContainer.childNodes;
-        children.forEach( function(elem) {
-            if (elem.style.zIndex > zIndex) {
-                elem.style.zIndex = elem.style.zIndex - 1;
-            }
-        });
-    }
-    
+	if (boardImagesContainer.hasChildNodes()) {
+		let children = boardImagesContainer.childNodes;
+		children.forEach( function(elem) {
+			if (elem.style.zIndex > zIndex) {
+				elem.style.zIndex = elem.style.zIndex - 1;
+			}
+		});
+	}
 }
 
 export function moveImagesForResizeWindow(dX) {
-    moveForResizeWindow(boardImagesContainer, dX);
+	moveForResizeWindow(boardImagesContainer, dX);
 }
 
 export function clearBoardFromImages() {
-    clear(boardImagesContainer);
+	clear(boardImagesContainer);
 }
 
 export function changeDisplayImagesContainer(propertyName) {
-    boardImagesContainer.style.display = propertyName;
+	boardImagesContainer.style.display = propertyName;
 }

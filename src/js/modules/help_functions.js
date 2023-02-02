@@ -15,19 +15,19 @@ export function getUrlFromStyle(backgroundStyle) {
 }
 
 export function clear(container) {
-    if (container.hasChildNodes()) {
-        const children = container.childNodes;
-        while (children.length > 0) {
-            children[0].remove();
-        }
-    }
+	if (container.hasChildNodes()) {
+		const children = container.childNodes;
+		while (children.length > 0) {
+			children[0].remove();
+		}
+	}
 }
 
 export function moveForResizeWindow(container, dX) {
-    if (container.hasChildNodes()) {
-        let children = container.childNodes;
-        children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) + 'px');
-    }
+	if (container.hasChildNodes()) {
+		let children = container.childNodes;
+		children.forEach(element => element.style.left = parseInt(element.style.left) + parseInt(dX) + 'px');
+	}
 }
 
 export function randomInt(min, max) {
@@ -36,33 +36,33 @@ export function randomInt(min, max) {
 }
 
 export function mergeSort(array) {
-    if (!array || !array.length) {
-        return null;
-    }
+	if (!array || !array.length) {
+		return null;
+	}
 
-    if (array.length <= 1) {
-        return array;
-    }
+	if (array.length <= 1) {
+		return array;
+	}
 
-    const middle = Math.floor(array.length / 2);
-    const arrayLeft = array.slice(0, middle);
-    const arrayRight = array.slice(middle);
+	const middle = Math.floor(array.length / 2);
+	const arrayLeft = array.slice(0, middle);
+	const arrayRight = array.slice(middle);
 
-    return merge(mergeSort(arrayLeft), mergeSort(arrayRight));
+	return merge(mergeSort(arrayLeft), mergeSort(arrayRight));
 };
 
 function merge(arrayPart1, arrayPart2) {
-    let arraySort = [];
-    let i = 0;
-    let j = 0;
-    
-    while (i < arrayPart1.length && j < arrayPart2.length) {
-        if (arrayPart1[i].style.zIndex < arrayPart2[j].style.zIndex) {
-            arraySort.push(arrayPart1[i++]);
-        } else {
-            arraySort.push(arrayPart2[j++]);
-        }
-    }
+	let arraySort = [];
+	let i = 0;
+	let j = 0;
+	
+	while (i < arrayPart1.length && j < arrayPart2.length) {
+		if (arrayPart1[i].style.zIndex < arrayPart2[j].style.zIndex) {
+			arraySort.push(arrayPart1[i++]);
+		} else {
+			arraySort.push(arrayPart2[j++]);
+		}
+	}
 
-    return [...arraySort, ...arrayPart1.slice(i), ...arrayPart2.slice(j)];
+	return [...arraySort, ...arrayPart1.slice(i), ...arrayPart2.slice(j)];
 };

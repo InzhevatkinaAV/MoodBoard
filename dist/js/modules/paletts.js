@@ -20,7 +20,7 @@ function addNewPalette(newPalette) {
 }
 
 export function drawPaletts(canvas, context) {
-    const coordsC = canvas.getBoundingClientRect()
+	const coordsC = canvas.getBoundingClientRect()
 
 	if (paletteContainer.hasChildNodes()) {
 		const children = paletteContainer.childNodes;
@@ -43,13 +43,13 @@ export function drawPaletts(canvas, context) {
 }
 
 export function movePalettsForResizeWindow(dX) {
-    moveForResizeWindow(paletteContainer, dX);
+	moveForResizeWindow(paletteContainer, dX);
 }
 
 export function clearBoardFromPaletts() {
-    clear(paletteContainer);
+	clear(paletteContainer);
 }
 
 export function changeDisplayPaletteContainer(propertyName) {
-    paletteContainer.style.display = propertyName;
+	paletteContainer.style.display = propertyName;
 }
