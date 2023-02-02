@@ -66,10 +66,13 @@ header {
                 object-fit: contain;
                 position: absolute;
             }
-            .pin {
+            .board-pins_container {
                 z-index: 1000;
-                object-fit: contain;
-                position: absolute;
+                .pin {
+                    z-index: 1000;
+                    object-fit: contain;
+                    position: absolute;
+                }
             }
             .board-palette_container {
                 z-index: 999;
@@ -246,7 +249,7 @@ footer {
     }
 }
 
-.overlay_with_result {
+.advice {
     display: none;
     justify-content: space-between;
     align-items: center;
