@@ -43,45 +43,29 @@ export function drawPins(canvas, context) {
 
 export function changePinsStyle(canvas, currentStyle) {
 	if (pinsContainer.hasChildNodes()) {
+		let canvasCoord = canvas.getBoundingClientRect();
+		let {right: canvasCoordRight, bottom: canvasCoordBottom} = canvasCoord;
+
 		const children = pinsContainer.childNodes;
-
-		children.forEach(element => styleOfPin(element, currentStyle));
-
-		const canvasCoord = canvas.getBoundingClientRect();
-		let {top: canvasCoordTop, right: canvasCoordRight, bottom: canvasCoordBottom, left: canvasCoordLeft} = canvasCoord;
-
-		let width, height;
-		if (currentStyle == 2) {
-			width = 100;
-			height = 100;
-		} else {
-			width = 50;
-			height = 50;
-		}
-		
-		for (let i = 0; i < children.length; i++) {
-			const pinCoord = children[i].getBoundingClientRect();
-			let {top: pinCoordTop, right: pinCoordRight, bottom: pinCoordBottom, left: pinCoordLeft} = pinCoord;
-
-			if (pinCoordTop < canvasCoordTop) {
-				children[i].style.top = canvasCoordTop + window.pageYOffset;
-			}
-			if (pinCoordLeft + width > canvasCoordRight) {
-				children[i].style.left = parseInt(pinCoordLeft) - (parseInt(pinCoordLeft + width) 
-										- parseInt(canvasCoordRight + window.pageXOffset)) + 'px';
-			}
-			if (pinCoordTop + height > canvasCoordBottom) {
-				children[i].style.top = parseInt(pinCoordTop) - (parseInt(pinCoordTop + height) 
-										- parseInt(canvasCoordBottom + window.pageYOffset)) + 'px';
-			}
-			if (pinCoordLeft < canvasCoordLeft) {
-				children[i].style.left = canvasCoordLeft + window.pageXOffset;
-			}
-		}
+		children.forEach(element => styleOfPin(element, currentStyle, canvasCoordBottom, canvasCoordRight));
 	}
 }
 
-function styleOfPin(pin, currentStyle) {
+function moveToBoard(pin, canvasCoordBottom, canvasCoordRight) {
+	const pinCoord = pin.getBoundingClientRect();
+	let {top: pinCoordTop, bottom: pinCoordBotton, left: pinCoordLeft} = pinCoord;
+
+	if (pinCoordLeft + parseInt(pin.style.width) > canvasCoordRight) {
+		pin.style.left = parseInt(pinCoordLeft) - (parseInt(pinCoordLeft + parseInt(pin.style.width)) 
+								- parseInt(canvasCoordRight + window.pageXOffset)) + 'px';
+	}
+	if (pinCoordBotton > canvasCoordBottom) {
+		pin.style.top = parseInt(pinCoordTop) - (parseInt(pinCoordTop + (pinCoordBotton - pinCoordTop)) 
+								- parseInt(canvasCoordBottom + window.pageYOffset)) + 'px';
+	}
+}
+
+function styleOfPin(pin, currentStyle, canvasCoordBottom, canvasCoordRight) {
 	let maxWidth = '50px';
 	let numSrc = randomInt(0, 4);
 	let promise;
@@ -92,7 +76,7 @@ function styleOfPin(pin, currentStyle) {
 			promise.then(
 				img => { 
 					pin.setAttribute('src', pinWhiteBoard);
-					pin.style.maxWidth = maxWidth;
+					pin.style.width = maxWidth;
 				},
 			);
 			break;
@@ -101,7 +85,7 @@ function styleOfPin(pin, currentStyle) {
 			promise.then(
 				img => { 
 					pin.setAttribute('src', pinCorkBoard[numSrc]);
-					pin.style.maxWidth = maxWidth;
+					pin.style.width = maxWidth;
 				},
 			);
 			break;
@@ -111,7 +95,8 @@ function styleOfPin(pin, currentStyle) {
 				img => { 
 					pin.setAttribute('src', pinGraphiteBoard[numSrc]);
 					maxWidth = '100px';
-					pin.style.maxWidth = maxWidth;
+					pin.style.width = maxWidth;
+					moveToBoard(pin,canvasCoordBottom, canvasCoordRight);
 				},
 			);
 			break;
